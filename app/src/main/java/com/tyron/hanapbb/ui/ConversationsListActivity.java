@@ -22,6 +22,7 @@ import com.tyron.hanapbb.ui.actionbar.ActionBarMenuItem;
 import com.tyron.hanapbb.ui.actionbar.BaseFragment;
 import com.tyron.hanapbb.ui.cells.ChatAvatarCell;
 import com.tyron.hanapbb.ui.components.LayoutHelper;
+import com.tyron.hanapbb.ui.fragments.ChatFragment;
 
 public class ConversationsListActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
 
@@ -48,25 +49,13 @@ public class ConversationsListActivity extends BaseFragment implements Notificat
             }
         });
 
-        ChatAvatarCell avatarCell = new ChatAvatarCell(context, this);
-        avatarCell.setTitle("Tyron Scott Lucena");
-        avatarCell.setSubTitle("Active now");
         actionBar.createActionMode();
         actionBar.setFitsSystemWindows(true);
         actionBar.setOccupyStatusBar(true);
 
         actionBar.createActionMode();
         ActionBarMenu menu = actionBar.createMenu();
-
-        avatarCell.setLayoutParams(LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT,LayoutHelper.MATCH_PARENT,Gravity.TOP | Gravity.START, 50,0,0,0));
-
-        menu.addItem(542,avatarCell);
         menu.addItem(44, R.drawable.ic_search_24);
-
-        avatarCell.setOnClickListener(ignore -> {
-            //presentFragment(new ConversationsListActivity(), false,false);
-            NotificationCenter.getInstance().postNotificationName(NotificationCenter.didUpdateConnectionState);
-        });
 
         actionBar.setBackButtonImage(R.drawable.ic_arrow_back);
         ActionBarMenuItem items = new ActionBarMenuItem(context,menu, 0xff000000);

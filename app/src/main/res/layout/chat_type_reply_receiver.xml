@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="start">
+
+    <LinearLayout
+        android:id="@+id/linear_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
+        android:background="#eeeeee"
+        android:padding="4dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="8dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="8dp">
+
+            <com.tyron.hanapbb.emoji.EmojiTextView
+                android:id="@+id/textview_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textColor="#000000"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="3dp"
+                android:layout_height="0dp"
+                android:layout_marginBottom="4dp"
+                android:background="#fe6262"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toTopOf="@+id/textview_message"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"></LinearLayout>
+
+            <com.tyron.hanapbb.emoji.EmojiTextView
+                android:id="@+id/textview_reply_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:maxEms="14"
+                android:singleLine="true"
+                android:text="This is a test reply message"
+                android:textColor="#000000"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@+id/textview_message"
+                app:layout_constraintStart_toStartOf="@+id/textview_reply_name"
+                app:layout_constraintTop_toBottomOf="@+id/textview_reply_name" />
+
+            <TextView
+                android:id="@+id/textview_reply_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Tyron Scott Lucena"
+                android:textColor="#fe6262"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/linearLayout"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</LinearLayout>

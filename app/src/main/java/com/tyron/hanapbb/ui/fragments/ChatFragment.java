@@ -3,18 +3,22 @@ package com.tyron.hanapbb.ui.fragments;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -54,8 +58,14 @@ import com.tyron.hanapbb.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.tyron.hanapbb.messenger.AndroidUtilities;
 import com.tyron.hanapbb.messenger.MessageObject;
 import com.tyron.hanapbb.messenger.UserConfig;
+import com.tyron.hanapbb.ui.actionbar.ActionBar;
+import com.tyron.hanapbb.ui.actionbar.ActionBarMenu;
+import com.tyron.hanapbb.ui.actionbar.BackDrawable;
+import com.tyron.hanapbb.ui.actionbar.BaseFragment;
+import com.tyron.hanapbb.ui.actionbar.MenuDrawable;
 import com.tyron.hanapbb.ui.adapters.ChatAdapter;
 import com.tyron.hanapbb.ui.actionbar.BottomSheet;
+import com.tyron.hanapbb.ui.cells.ChatAvatarCell;
 import com.tyron.hanapbb.ui.components.CubicBezierInterpolator;
 import com.tyron.hanapbb.ui.components.ISwipeControllerActions;
 import com.tyron.hanapbb.ui.components.LayoutHelper;
@@ -71,8 +81,9 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ChatFragment extends Fragment {
+public class ChatFragment extends BaseFragment {
 
+    private Context context;
     private GligarPicker picker = new GligarPicker();
     private RecyclerView recyclerview;
 
@@ -84,7 +95,6 @@ public class ChatFragment extends Fragment {
     private final DatabaseReference chatRef = firebase.getReference("chats");
     private Query chatQuery;
 
-    private Toolbar toolbar;
 
     private TextView textview_chatname;
     private TextView textview_reply_name;
@@ -107,12 +117,10 @@ public class ChatFragment extends Fragment {
     private boolean firstLoad = true;
     private boolean isReply = true;
     private boolean debugMode;
-    private Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = new Handler(Looper.getMainLooper());
     private int replySelected = 0;
-    private CircleImageView chat_image;
 
     private ViewGroup root;
-    private TextView textview_status;
 
     EmojiPopup emojiPopup;
 
@@ -240,33 +248,42 @@ public class ChatFragment extends Fragment {
     private static String chat_id;
     private final int limit = 12;
 
-    public static ChatFragment newInstance(String chat_id) {
-        ChatFragment fragment = new ChatFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("chat_id", chat_id);
-        fragment.setArguments(bundle);
+    private ChatAvatarCell avatarCell;
 
-        return fragment;
+    public ChatFragment(String chat_id) {
+        ChatFragment.chat_id = chat_id;
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null)
-            chat_id = getArguments().getString("chat_id");
-    }
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_chat, container, false);
+    public View createView(Context context) {
+
+
+        this.context = context;
+
+        LayoutInflater inflater = LayoutInflater.from(context);
+
+        fragmentView = new FrameLayout(context);
+        View view = inflater.inflate(R.layout.activity_chat, (ViewGroup) fragmentView, false);
         view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         recyclerview = view.findViewById(R.id.recyclerview1);
 
-        toolbar = view.findViewById(R.id.toolbar);
-        AppCompatActivity activity = (AppCompatActivity) requireActivity();
-        activity.setSupportActionBar(toolbar);
-        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((ViewGroup) fragmentView).addView(view);
+
+        avatarCell = new ChatAvatarCell(context,this);
+        actionBar.createActionMode();
+       // actionBar.setExtraHeight(AndroidUtilities.dp(6));
+        ActionBarMenu menu = actionBar.createMenu();
+
+
+        avatarCell.setLayoutParams(LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT,LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.START, 50,0,0,0));
+
+        Drawable menuDrawable = new MenuDrawable();
+        menu.addItem(542,avatarCell);
+        menu.addItem(44, menuDrawable);
+
+        BackDrawable backButton = new BackDrawable(false);
+        actionBar.setBackButtonDrawable(backButton);
 
         initialize(view);
         initializeLogic();
@@ -274,9 +291,20 @@ public class ChatFragment extends Fragment {
 
         fetchProfile();
 
-        activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-        return view;
+
+        actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
+            @Override
+            public void onItemClick(int id) {
+                if (id == -1) {
+
+                }
+            }
+        });
+
+        getParentActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        return fragmentView;
     }
+
     public static String getName(){
         return chat_name;
     }
@@ -291,9 +319,10 @@ public class ChatFragment extends Fragment {
 
                 if(model != null) {
                     chat_name = model.getName();
-                    textview_chatname.setText(chat_name);
+                    avatarCell.setTitle(chat_name);
+                    avatarCell.setSubTitle("Active now");
                     String url = model.getPhotoUrl();
-                    Glide.with(getContext()).load(url).into(chat_image);
+                    avatarCell.setPicture(url);
                 }
             }
 
@@ -435,11 +464,11 @@ public class ChatFragment extends Fragment {
 
     private void initialize(View view) {
 
-        settingsPref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        settingsPref = PreferenceManager.getDefaultSharedPreferences(context);
 
         debugMode = settingsPref.getBoolean("debug", false);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
         layoutManager.setStackFromEnd(true);
         recyclerview.setLayoutManager(layoutManager);
 
@@ -448,10 +477,10 @@ public class ChatFragment extends Fragment {
         adapter = new ChatAdapter(chatModel);
         recyclerview.setAdapter(adapter);
         recyclerview.setItemAnimator(new MyItemAnimator());
-        SwipeController controller = new SwipeController(getContext(), new ISwipeControllerActions(){
+        SwipeController controller = new SwipeController(context, new ISwipeControllerActions(){
             @Override
             public void onSwipePerformed(int adapterPosition) {
-                textview_reply_name.setText(chatModel.get(adapterPosition).getUid() == UserConfig.getUid()? textview_chatname.getText() : "Replying to yourself");
+                textview_reply_name.setText(chatModel.get(adapterPosition).getUid().equals(UserConfig.getUid()) ? textview_chatname.getText() : "Replying to yourself");
                 textview_reply_message.setText(chatModel.get(adapterPosition).getMessage());
                 replySelected = adapterPosition;
                 if(!isReply){
@@ -482,13 +511,10 @@ public class ChatFragment extends Fragment {
         textview_reply_message = view.findViewById(R.id.textview_reply_message);
         btn_close_reply = view.findViewById(R.id.btn_close);
 
-        chat_image = view.findViewById(R.id.toolbar_icon);
-
         emoji_button = view.findViewById(R.id.emoji_button);
-        textview_status = view.findViewById(R.id.textview_status);
-        root = getActivity().getWindow().findViewById(android.R.id.content);
+        root = getParentActivity().getWindow().findViewById(android.R.id.content);
 
-        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE | WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        getParentActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE | WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 
         OnEmojiPopupDismissListener popupDismissListener = new OnEmojiPopupDismissListener() {
             @Override
@@ -528,38 +554,38 @@ public class ChatFragment extends Fragment {
 
     }
     private void initKeyboardAnimation(){
-//        getActivity().getWindow().getDecorView().setOnApplyWindowInsetsListener((view,insets) -> {
-//            if(view != null) {
+        getParentActivity().getWindow().getDecorView().setOnApplyWindowInsetsListener((view,insets) -> {
+            if(view != null) {
 //                ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) toolbar.getLayoutParams();
 //                params.setMargins(0,insets.getStableInsetTop(),0,0);
-//                int screenHeight = AndroidUtilities.getScreenHeight();
-//
-//                int[] location = new int[2];
-//                bottom_panel.getLocationOnScreen(location);
-//
-//                if(debugMode)textview_status.setText("System inset bottom: " + insets.getSystemWindowInsetBottom() + "\n stable inset bottom: " + insets.getStableInsetBottom() + "\n Screen height: " + AndroidUtilities.getScreenHeight() + "\n EditText Position Y: " + location[1] + "\n EditText height : " + bottom_panel.getHeight());
-//
-//                int keyboardOffset = 410;
-//                int offset = insets.getSystemWindowInsetBottom() - insets.getStableInsetBottom();
-//                    if (offset > keyboardOffset) {
-//                        SharedPreferences.Editor editor = getActivity().getSharedPreferences("config", Context.MODE_PRIVATE).edit();
-//                        editor.putInt("KEYBOARD_HEIGHT", offset);
-//                        editor.apply();
-//                        keyboard_height = offset;
-//
-//                        int start = root.getHeight();
-//                        int end = screenHeight - offset;
-//                        resizeView(root, start, end);
-//                    }else{
-//                        resizeView(root, root.getHeight(), AndroidUtilities.getScreenHeight());
-//                    }
-//
-//
-//                    Log.d("HanapBb", "Window insets dispatched \n" + "screen height : " + screenHeight + "\n inset bottom " + insets.getSystemWindowInsetBottom());
-//                }
-//
-//            return view.onApplyWindowInsets(insets);
-//        });
+                int screenHeight = AndroidUtilities.getScreenHeight();
+
+                int[] location = new int[2];
+                bottom_panel.getLocationOnScreen(location);
+
+                if(debugMode)avatarCell.setSubTitle("System inset bottom: " + insets.getSystemWindowInsetBottom() + "\n stable inset bottom: " + insets.getStableInsetBottom() + "\n Screen height: " + AndroidUtilities.getScreenHeight() + "\n EditText Position Y: " + location[1] + "\n EditText height : " + bottom_panel.getHeight());
+
+                int keyboardOffset = 410;
+                int offset = insets.getSystemWindowInsetBottom() - insets.getStableInsetBottom();
+                    if (offset > keyboardOffset) {
+                        SharedPreferences.Editor editor = getParentActivity().getSharedPreferences("config", Context.MODE_PRIVATE).edit();
+                        editor.putInt("KEYBOARD_HEIGHT", offset);
+                        editor.apply();
+                        keyboard_height = offset;
+
+                        int start = root.getHeight();
+                        int end = screenHeight - offset;
+                        resizeView(root, start, end);
+                    }else{
+                        resizeView(root, root.getHeight(), AndroidUtilities.getScreenHeight());
+                    }
+
+
+                    Log.d("HanapBb", "Window insets dispatched \n" + "screen height : " + screenHeight + "\n inset bottom " + insets.getSystemWindowInsetBottom());
+                }
+
+            return view.onApplyWindowInsets(insets);
+        });
     }
     private void resizeView(View view, int start, int end){
         ValueAnimator valueAnimator = ValueAnimator.ofInt(start, end);
@@ -584,41 +610,16 @@ public class ChatFragment extends Fragment {
     }
 
     @Override
-    public Animation onCreateAnimation(int transit, boolean enter, int nextAnim){
-        Animation anim = super.onCreateAnimation(transit, enter, nextAnim);
-
-        if (anim == null && nextAnim != 0) {
-            anim = AnimationUtils.loadAnimation(getActivity(), nextAnim);
-        }
-        if (anim != null) {
-            anim.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    initRecycler();
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-            });
-        }
-
-        return anim;
+    protected void onTransitionAnimationEnd(boolean isOpen, boolean backward) {
+        super.onTransitionAnimationEnd(isOpen, backward);
+        initRecycler();
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onFragmentDestroy() {
+        super.onFragmentDestroy();
         chatRef.removeEventListener(chatEventListener);
         chatQuery.removeEventListener(firstLoadEventListener);
-        getActivity().getWindow().getDecorView().setOnApplyWindowInsetsListener(null);
+        getParentActivity().getWindow().getDecorView().setOnApplyWindowInsetsListener(null);
     }
-
-
 }

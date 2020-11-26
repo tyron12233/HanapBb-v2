@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.bumptech.glide.Glide;
 import com.tyron.hanapbb.R;
 import com.tyron.hanapbb.messenger.AndroidUtilities;
 import com.tyron.hanapbb.messenger.NotificationCenter;
@@ -18,12 +19,13 @@ import com.tyron.hanapbb.ui.ConversationsListActivity;
 import com.tyron.hanapbb.ui.actionbar.ActionBar;
 import com.tyron.hanapbb.ui.actionbar.SimpleTextView;
 import com.tyron.hanapbb.ui.actionbar.Theme;
+import com.tyron.hanapbb.ui.fragments.ChatFragment;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatAvatarCell extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
 
-    private ConversationsListActivity parentFragment;
+    private ChatFragment parentFragment;
     private boolean occupyStatusBar = false;
 
     private SimpleTextView titleTextView;
@@ -33,7 +35,7 @@ public class ChatAvatarCell extends FrameLayout implements NotificationCenter.No
 
     private int leftPadding = AndroidUtilities.dp(8);
 
-    public ChatAvatarCell(@NonNull Context context, ConversationsListActivity activity) {
+    public ChatAvatarCell(@NonNull Context context, ChatFragment activity) {
         super(context);
         parentFragment = activity;
         avatarImageView = new CircleImageView(context);
@@ -43,7 +45,7 @@ public class ChatAvatarCell extends FrameLayout implements NotificationCenter.No
         //TODO :set on click to profile
 
         titleTextView = new SimpleTextView(context);
-        titleTextView.setTextColor(Color.parseColor("#000000"));
+        titleTextView.setTextColor(Color.parseColor("#ffffff"));
         titleTextView.setTextSize(18);
         titleTextView.setGravity(Gravity.START);
         titleTextView.setLeftDrawableTopPadding(-AndroidUtilities.dp(1.3f));
@@ -53,7 +55,7 @@ public class ChatAvatarCell extends FrameLayout implements NotificationCenter.No
         subtitleTextView = new SimpleTextView(context);
         subtitleTextView.setTextSize(14);
         subtitleTextView.setGravity(Gravity.START);
-        subtitleTextView.setTextColor(Color.parseColor("#000000"));
+        subtitleTextView.setTextColor(Theme.ACTION_BAR_SUBTITLE_COLOR);
 
         addView(subtitleTextView);
 
@@ -90,7 +92,7 @@ public class ChatAvatarCell extends FrameLayout implements NotificationCenter.No
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        int actionBarHeight = ActionBar.getCurrentActionBarHeight();
+        int actionBarHeight = ActionBar.getCurrentActionBarHeight() + AndroidUtilities.dp(6);
         int viewTop = (actionBarHeight - AndroidUtilities.dp(42)) / 2 + (Build.VERSION.SDK_INT >= 21  && occupyStatusBar? AndroidUtilities.statusBarHeight : 0);
         avatarImageView.layout(leftPadding, viewTop, leftPadding + AndroidUtilities.dp(42), viewTop + AndroidUtilities.dp(42));
         int l = leftPadding + (avatarImageView.getVisibility() == VISIBLE ? AndroidUtilities.dp( 54) : 0);
@@ -107,5 +109,8 @@ public class ChatAvatarCell extends FrameLayout implements NotificationCenter.No
     }
     public void setSubTitle(String subtitle){
         subtitleTextView.setText(subtitle);
+    }
+    public void setPicture(String url){
+        Glide.with(getContext()).load(url).into(avatarImageView);
     }
 }

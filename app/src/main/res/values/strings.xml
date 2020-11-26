@@ -1,0 +1,115 @@
+<resources>
+    <string name="app_name">HanapBb</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <!-- Strings for login -->
+    <string name="login_welcome">Login to your account</string>
+    <string name="register_welcome">Create your account</string>
+    <string name="btn_login">Login</string>
+    <string name="btn_register">Register</string>
+    <string name="forgot_password">Forgot your password?</string>
+    <string name="text_login">Already have an account?</string>
+    <string name="text_register">Don\'t have an account yet? </string>
+    <string name="input_email">Email</string>
+    <string name="input_password">Password</string>
+    <string name="input_password_confirm">Confirm your password</string>
+    <string name="other_login_methods">OR</string>
+
+    <string name="passwords_must_match">Passwords must match</string>
+    <string name="invalid_password">Password must be at least 8 characters.</string>
+    <string name="invalid_email">Must be a valid email</string>
+
+    <string name="error_weak_password">Password is too weak</string>
+    <string name="error_invalid_credentials">Wrong email or password.</string>
+    <string name="error_user_exists">User with the same email already exists</string>
+    <string name="error_user_not_exist">User with this email doesn\'t exist.</string>
+
+    <!--update dialog -->
+    <string name="update_whats_new">What\'s new?</string>
+    <string name="update_dismiss">Dismiss</string>
+    <string name="update_install">Install now</string>
+
+    <string name="action_search">Search</string>
+
+    <!--profile create -->
+    <string name="profile_gender_select">Select your gender</string>
+    <string name="next">Continue</string>
+    <string name="profile_gender_male">Male</string>
+    <string name="profile_gender_female">Female</string>
+    <string name="interest_gender">I am interested in</string>
+
+    <string name="name">Name</string>
+    <string name="username">Username</string>
+    <string name="age">Age</string>
+    <string name="invalid_username">Username contains invalid characters.</string>
+    <string name="username_checking">Checking username.</string>
+    <string name="username_available">Username is available</string>
+    <string name="username_taken">Username is already taken</string>
+
+    <string name="find_users">Find existing users</string>
+
+    <!--chat activity -->
+    <string name="btn_attach">Attach a file</string>
+    <string name="btn_emoji">Emoji picker</string>
+    <string name="edittext_message">Write your message</string>
+    <string name="empty_state_title">No messages, yet.</string>
+    <string name="empty_state_subtitle">Start typing and your messages will show here.</string>
+
+    <string name="emoji_category_recent">Recent</string>
+    <string name="emoji_backspace">Backspace</string>
+    <string name="emoji_ios_category_smileysandpeople">Faces</string>
+    <string name="emoji_ios_category_animalsandnature">Nature</string>
+    <string name="emoji_ios_category_foodanddrink">Food</string>
+    <string name="emoji_ios_category_activities">Activities</string>
+    <string name="emoji_ios_category_travelandplaces">Places</string>
+    <string name="emoji_ios_category_objects">Objects</string>
+    <string name="emoji_ios_category_symbols">Symbols</string>
+    <string name="emoji_ios_category_flags">Flags</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="debug_header">Debug</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- debug Preferences -->
+    <string name="debug_title">Enable debug mode</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+    <string name="PickerPhotos">Photos</string>
+    <string name="PickerVideo">Video</string>
+    <string name="AllPhotos">All Photos</string>
+    <string name="AllVideo">All Videos</string>
+    <string name="NoPhotos">No photos yet</string>
+    <string name="NoVideo">No videos yet</string>
+    <string name="SearchImages">FIND IMAGES</string>
+    <string name="SearchGifs">FIND GIFS</string>
+    <string name="NoRecentPhotos">No recent photos</string>
+    <string name="NoRecentGIFs">No recent GIFs</string>
+    <string name="NoResult">No results</string>
+    <string name="Crop">CROP</string>
+    <string name="AttachPhoto">Photo</string>
+    <string name="Of">%1$d of %2$d</string>
+    <string name="Set">Set</string>
+    <string name="Album">Album</string>
+
+    <string name="ClearSearch">Clear search history?</string>
+    <string name="ClearButton">Clear</string>
+
+    <string name="SearchImagesTitle">Search web</string>
+    <string name="SearchGifsTitle">Search GIFs</string>
+
+    <string name="SearchImagesInfo">WEB SEARCH</string>
+    <string name="MostSelect">You can select up to %d pictures</string>
+
+    <string name="Send">Done</string>
+    <string name="Cancel">Cancel</string>
+    <string name="Preview">Preview</string>
+    <string name="album_read_fail">Failed to read an album, please check permissions</string>
+</resources>

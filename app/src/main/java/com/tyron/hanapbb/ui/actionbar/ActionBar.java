@@ -67,6 +67,7 @@ public class ActionBar extends FrameLayout {
         super(context);
     }
 
+
     private void createBackButtonImage() {
         if (backButtonImageView != null) {
             return;
@@ -77,7 +78,7 @@ public class ActionBar extends FrameLayout {
         backButtonImageView.setScaleType(ImageView.ScaleType.CENTER);
         backButtonImageView
                 .setBackgroundDrawable(Theme.createBarSelectorDrawable(itemsBackgroundColor));
-        LayoutParams params = LayoutHelper.createFrame(28, 30);
+        LayoutParams params = LayoutHelper.createFrame(25, 27);
         params.gravity = Gravity.CENTER_VERTICAL;
         params.setMargins(AndroidUtilities.dp(8),0,0,0);
         backContainer.addView(backButtonImageView, params);
@@ -440,7 +441,7 @@ public class ActionBar extends FrameLayout {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
-        int actionBarHeight = getCurrentActionBarHeight();
+        int actionBarHeight = getCurrentActionBarHeight() + AndroidUtilities.dp(6);
         int actionBarHeightSpec = MeasureSpec.makeMeasureSpec(actionBarHeight, MeasureSpec.EXACTLY);
 
         setMeasuredDimension(width, actionBarHeight
@@ -506,7 +507,7 @@ public class ActionBar extends FrameLayout {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        int additionalTop = occupyStatusBar ? AndroidUtilities.statusBarHeight : 0;
+        int additionalTop = (occupyStatusBar ? AndroidUtilities.statusBarHeight : 0); // AndroidUtilities.dp(6);
     //    int additionalTop= 0 ;
 
         int textLeft;
@@ -601,6 +602,7 @@ public class ActionBar extends FrameLayout {
             }
 
             //标题居中
+            if(screenSize == null)  screenSize = AndroidUtilities.getRealScreenSize();
             childLeft = screenSize.x / 2;
             if (child instanceof ActionBarMenuItem){
                 int realTextSize;

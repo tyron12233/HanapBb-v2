@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,12 +19,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -40,7 +44,10 @@ import com.tyron.hanapbb.messenger.AndroidUtilities;
 import com.tyron.hanapbb.messenger.UserConfig;
 import com.tyron.hanapbb.ui.HomeActivity;
 import com.tyron.hanapbb.ui.SettingsActivity;
+import com.tyron.hanapbb.ui.actionbar.ActionBar;
+import com.tyron.hanapbb.ui.actionbar.ActionBarMenu;
 import com.tyron.hanapbb.ui.actionbar.BaseFragment;
+import com.tyron.hanapbb.ui.components.LayoutHelper;
 import com.tyron.hanapbb.ui.models.ConversationsModel;
 
 import java.util.ArrayList;
@@ -53,13 +60,17 @@ import com.tyron.hanapbb.ui.models.UserModel;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ConversationsList extends Fragment {
+public class ConversationsList extends BaseFragment {
+
+    private Context context;
 
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference conversationsRef = firebaseDatabase.getReference("conversations/");
     private DatabaseReference profileRef = firebaseDatabase.getReference("users/");
     private Query query = conversationsRef.child(UserConfig.getUid()).limitToLast(30);
     private DatabaseReference chatRef = firebaseDatabase.getReference("chats");
+
+    private CircleImageView avatar;
 
     private FirebaseRecyclerOptions<ConversationsModel> options = new FirebaseRecyclerOptions.Builder<ConversationsModel>()
             .setQuery(query,ConversationsModel.class).build();
@@ -76,85 +87,98 @@ public class ConversationsList extends Fragment {
         return new ConversationsList();
     }
 
+
+
     @Override
-    public void onStart(){
-        super.onStart();
+    public boolean onFragmentCreate() {
         adapter.startListening();
+
+        return super.onFragmentCreate();
     }
+
     @Override
-    public void onStop(){
-        super.onStop();
+    public void onFragmentDestroy() {
         adapter.stopListening();
-    }
-    @Override
-    public void onCreate(Bundle bundle){
-        super.onCreate(bundle);
-        setHasOptionsMenu(true);
+        super.onFragmentDestroy();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch(item.getItemId()){
-            case R.id.action_settings:
-                startActivity(new Intent(getContext(), SettingsActivity.class));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+//    @Override
+//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//        switch(item.getItemId()){
+//            case R.id.action_settings:
+//                startActivity(new Intent(getContext(), SettingsActivity.class));
+//                return true;
+//            default:
+//                return super.onOptionsItemSelected(item);
+//        }
+//
+//    }
 
-    }
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.conversations_list_fragment, container, false);
+    public View createView(Context context) {
+        this.context = context;
+
+        LayoutInflater inflater = LayoutInflater.from(context);
+        fragmentView = new FrameLayout(context);
+
+
+        View view = inflater.inflate(R.layout.conversations_list_fragment, (ViewGroup) fragmentView, false);
+
+        ((ViewGroup) fragmentView).addView(view);
         Toolbar toolbar = view.findViewById(R.id.toolbar);
         floatingActionButton = view.findViewById(R.id.floatingActionButton);
         profile_imageview = view.findViewById(R.id.toolbar_icon);
-        ((AppCompatActivity)requireActivity()).setSupportActionBar(toolbar);
 
-
-
-        return view;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
+        actionBar.setAddToContainer(false);
         list = view.findViewById(R.id.list);
 
-        LinearLayoutManager linearLayoutManager= new LinearLayoutManager(getActivity());
+        LinearLayoutManager linearLayoutManager= new LinearLayoutManager(getParentActivity());
         list.setLayoutManager(linearLayoutManager);
         list.setAdapter(adapter);
 
         initialize();
-        getActivity().getWindow().getDecorView().setOnApplyWindowInsetsListener((view1, insets) -> {
+        getParentActivity().getWindow().getDecorView().setOnApplyWindowInsetsListener((view1, insets) -> {
             int marginBottom;
             marginBottom = insets.getSystemWindowInsetBottom() - insets.getStableInsetBottom();
+            int marginTop = insets.getSystemWindowInsetTop() - insets.getStableInsetTop();
+
+            if(marginTop == 0 | marginBottom == 0){
+                marginBottom = insets.getStableInsetBottom();
+                marginTop = insets.getSystemWindowInsetTop();
+            }
             if (view1 != null) {
-                ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) floatingActionButton.getLayoutParams();
-                params.bottomMargin += marginBottom;
-                floatingActionButton.setLayoutParams(params);
+                ConstraintLayout.LayoutParams params1 = (ConstraintLayout.LayoutParams) floatingActionButton.getLayoutParams();
+                params1.bottomMargin += marginBottom;
+                floatingActionButton.setLayoutParams(params1);
+
+                ((ConstraintLayout.LayoutParams)toolbar.getLayoutParams()).topMargin = marginTop;
             }
 
             return view1.onApplyWindowInsets(insets);
         });
+
+        return fragmentView;
     }
+//
+//    @Override
+//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+//        super.onViewCreated(view, savedInstanceState);
+//
+//    }
 
     private void initialize() {
-        floatingActionButton.setOnClickListener((view) -> {
-            ((HomeActivity)getActivity()).replaceFragment((Fragment) new SearchUsersFragment());
-        });
+//        floatingActionButton.setOnClickListener((view) -> {
+//            ((HomeActivity)getActivity()).replaceFragment((Fragment) new SearchUsersFragment());
+//        });
         String url = UserConfig.config.getPhotoUrl();
-        Glide.with(getContext()).load(url).into(profile_imageview);
+        Glide.with(context).load(url).into(profile_imageview);
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.conversations_menu, menu);
-    }
+//    @Override
+//    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+//        inflater.inflate(R.menu.conversations_menu, menu);
+//    }
 
 
     FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<ConversationsModel, ViewHolder>(options) {
@@ -181,7 +205,7 @@ public class ConversationsList extends Fragment {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     UserModel model = snapshot.getValue(UserModel.class);
                     textview_name.setText(model.getName());
-                    Glide.with(getContext()).load(model.getPhotoUrl()).centerCrop().into(chat_pic);
+                    Glide.with(context).load(model.getPhotoUrl()).centerCrop().into(chat_pic);
                 }
 
                 @Override
@@ -207,7 +231,7 @@ public class ConversationsList extends Fragment {
             });
 
             rootView.setOnClickListener((v) -> {
-                ((HomeActivity)getActivity()).replaceFragment(ChatFragment.newInstance(model.getChat_id()));
+                presentFragment(new ChatFragment(model.getChat_id()),false,false);
             });
         }
     };

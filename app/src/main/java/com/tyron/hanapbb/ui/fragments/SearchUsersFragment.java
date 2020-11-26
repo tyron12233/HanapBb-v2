@@ -98,7 +98,7 @@ public class SearchUsersFragment extends Fragment {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             if (snapshot.exists()) {
-                                ((HomeActivity) getActivity()).replaceFragment(ChatFragment.newInstance(chat_id));
+                             //   ((HomeActivity) getActivity()).replaceFragment(ChatFragment.newInstance(chat_id));
                             } else {
                                 ConversationsModel newModel = new ConversationsModel();
 
