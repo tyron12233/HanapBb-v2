@@ -18,6 +18,7 @@ import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -36,21 +37,30 @@ import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.tyron.hanapbb.R;
 import com.tyron.hanapbb.emoji.EmojiTextView;
 import com.tyron.hanapbb.messenger.AndroidUtilities;
+import com.tyron.hanapbb.messenger.NotificationCenter;
 import com.tyron.hanapbb.messenger.UserConfig;
 import com.tyron.hanapbb.ui.HomeActivity;
 import com.tyron.hanapbb.ui.SettingsActivity;
 import com.tyron.hanapbb.ui.actionbar.ActionBar;
 import com.tyron.hanapbb.ui.actionbar.ActionBarMenu;
 import com.tyron.hanapbb.ui.actionbar.BaseFragment;
+import com.tyron.hanapbb.ui.adapters.ConversationsListAdapter;
 import com.tyron.hanapbb.ui.components.LayoutHelper;
 import com.tyron.hanapbb.ui.models.ConversationsModel;
 
+import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import com.google.firebase.database.FirebaseDatabase;
@@ -78,9 +88,12 @@ public class ConversationsList extends BaseFragment {
     private RecyclerView list;
 
     private List<ConversationsModel> conversations_list = new ArrayList<ConversationsModel>();
+    private List<ConversationsModel> adapterList = new ArrayList<>();
 
     private FloatingActionButton floatingActionButton;
 
+    private ValueEventListener[] listeners;
+    private List<String> keys = new ArrayList<>();
     private CircleImageView profile_imageview;
 
     public static ConversationsList newInstance() {
@@ -91,14 +104,13 @@ public class ConversationsList extends BaseFragment {
 
     @Override
     public boolean onFragmentCreate() {
-        adapter.startListening();
+//        adapter.startListening();
 
         return super.onFragmentCreate();
     }
 
     @Override
     public void onFragmentDestroy() {
-        adapter.stopListening();
         super.onFragmentDestroy();
     }
 
@@ -135,6 +147,8 @@ public class ConversationsList extends BaseFragment {
 
         LinearLayoutManager linearLayoutManager= new LinearLayoutManager(getParentActivity());
         list.setLayoutManager(linearLayoutManager);
+
+        ConversationsListAdapter adapter = new ConversationsListAdapter(adapterList);
         list.setAdapter(adapter);
 
         initialize();
@@ -160,88 +174,83 @@ public class ConversationsList extends BaseFragment {
 
         return fragmentView;
     }
-//
-//    @Override
-//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-//        super.onViewCreated(view, savedInstanceState);
-//
-//    }
 
     private void initialize() {
-//        floatingActionButton.setOnClickListener((view) -> {
-//            ((HomeActivity)getActivity()).replaceFragment((Fragment) new SearchUsersFragment());
-//        });
+
+        conversationsRef.child(UserConfig.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                listeners = new ValueEventListener[(int) snapshot.getChildrenCount()];
+                for(DataSnapshot ds : snapshot.getChildren()) {
+                    String chat_id = ds.child("chat_id").getValue(String.class);
+                    keys.add(chat_id);
+                }
+                retrieveConversations();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        floatingActionButton.setOnClickListener((view) -> {
+            presentFragment(new SearchUsersFragment(),false,false);
+        });
         String url = UserConfig.config.getPhotoUrl();
         Glide.with(context).load(url).into(profile_imageview);
+
     }
 
-//    @Override
-//    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-//        inflater.inflate(R.menu.conversations_menu, menu);
-//    }
+    private void retrieveConversations() {
 
+        for(int i = 0; i < listeners.length; i++){
 
-    FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<ConversationsModel, ViewHolder>(options) {
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.conversation_list_item_view, parent, false);
-
-            return new ViewHolder(view);
-        }
-
-        @Override
-        protected void onBindViewHolder(ViewHolder holder, final int position, ConversationsModel model) {
-            View view = holder.itemView;
-            final TextView textview_name = view.findViewById(R.id.textview_name);
-            final EmojiTextView textview_message = view.findViewById(R.id.textview_lastmessage);
-            final ViewGroup rootView = view.findViewById(R.id.root);
-            final CircleImageView chat_pic = view.findViewById(R.id.circleImageView);
-
-            textview_name.setTypeface(textview_name.getTypeface(), Typeface.BOLD);
-
-            profileRef.child(model.getChat_id().replace(UserConfig.getUid(),"")).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    UserModel model = snapshot.getValue(UserModel.class);
-                    textview_name.setText(model.getName());
-                    Glide.with(context).load(model.getPhotoUrl()).centerCrop().into(chat_pic);
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-
-            chatRef.child(model.getChat_id()).child("messages").limitToLast(1).addValueEventListener(new ValueEventListener() {
+            final int finalI = i;
+            listeners[i] = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     for(DataSnapshot ds : snapshot.getChildren()){
                         MessagesModel model = ds.getValue(MessagesModel.class);
 
-                        textview_message.setText(model.getMessage());
+                        ConversationsModel conv = new ConversationsModel();
+                        conv.setLastMessage(model.getMessage());
+                        conv.setLastTime(model.getTime());
+                        conv.setLastUid(model.getUid());
+                        conv.setUserId(keys.get(finalI).replace(UserConfig.getUid(), ""));
+
+                        if(adapterList.isEmpty() || adapterList.size() < keys.size() || adapterList.get(finalI) == null){
+                            adapterList.add(conv);
+                        }else{
+                            adapterList.set(finalI, conv);
+                        }
+
+                        if(adapterList.size() < keys.size() || adapterList.get(finalI) == null){
+                            list.getAdapter().notifyDataSetChanged();
+                        }else{
+                            Collections.sort(adapterList, new Comparator<ConversationsModel>() {
+                                @Override
+                                public int compare(ConversationsModel o1, ConversationsModel o2) {
+                                    return Long.compare(o1.getLastTime(),o2.getLastTime());
+                                }
+                            });
+                            //((ConversationsListAdapter)list.getAdapter()).updateList(conversations_list);
+                            list.getAdapter().notifyDataSetChanged();
+                        }
                     }
+                    conversations_list.clear();
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
 
                 }
-            });
+            };
 
-            rootView.setOnClickListener((v) -> {
-                presentFragment(new ChatFragment(model.getChat_id()),false,false);
-            });
-        }
-    };
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
         }
 
-        public ViewHolder(View v, int viewType) {
-            super(v);
+        for(int i = 0; i < listeners.length; i++){
+            chatRef.child(keys.get(i)).child("messages").limitToLast(1).addValueEventListener(listeners[i]);
         }
     }
+
 }

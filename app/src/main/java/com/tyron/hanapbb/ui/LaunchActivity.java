@@ -34,7 +34,12 @@ public class LaunchActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //AndroidUtilities.fillStatusBarHeight(this);
+        VersionModel version = new VersionModel();
+        version.setMin_version(1.0f);
+        version.setRequired(true);
+        version.setMessage("Initial relese");
+        version.setVersion(1.0f);
+        databaseReference.child("latest_update").setValue(version);;
 
             if(AndroidUtilities.isNetworkAvailable(this)) {
                 checkLatestVersion();

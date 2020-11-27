@@ -8,6 +8,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.tyron.hanapbb.emoji.EmojiManager;
 import com.tyron.hanapbb.emoji.ios.IosEmojiProvider;
 import com.tyron.hanapbb.messenger.AndroidUtilities;
+import com.tyron.hanapbb.messenger.UserConfig;
 
 public class MyApplication extends Application {
 
@@ -21,5 +22,8 @@ public class MyApplication extends Application {
         applicationContext = this;
         AndroidUtilities.fillStatusBarHeight(applicationContext);
         applicationHandler = new Handler(applicationContext.getMainLooper());
+
+        if(UserConfig.getUid() != null) UserConfig.updateStatus();
     }
+
 }

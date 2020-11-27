@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -48,6 +50,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import com.google.firebase.firestore.auth.User;
 import com.opensooq.supernova.gligar.GligarPicker;
 import com.tyron.hanapbb.R;
 import com.tyron.hanapbb.emoji.EmojiEditText;
@@ -57,6 +60,7 @@ import com.tyron.hanapbb.emoji.listeners.OnEmojiPopupShownListener;
 import com.tyron.hanapbb.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.tyron.hanapbb.messenger.AndroidUtilities;
 import com.tyron.hanapbb.messenger.MessageObject;
+import com.tyron.hanapbb.messenger.NotificationCenter;
 import com.tyron.hanapbb.messenger.UserConfig;
 import com.tyron.hanapbb.ui.actionbar.ActionBar;
 import com.tyron.hanapbb.ui.actionbar.ActionBarMenu;
@@ -81,7 +85,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ChatFragment extends BaseFragment {
+public class ChatFragment extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
 
     private Context context;
     private GligarPicker picker = new GligarPicker();
@@ -94,6 +98,10 @@ public class ChatFragment extends BaseFragment {
     private final DatabaseReference usersRef = firebase.getReference("users");
     private final DatabaseReference chatRef = firebase.getReference("chats");
     private Query chatQuery;
+    private String receiver_id;
+
+    long last_text_edit = 0;
+    long delay = 1500;
 
 
     private TextView textview_chatname;
@@ -154,7 +162,11 @@ public class ChatFragment extends BaseFragment {
             }
             adapter.notifyItemRangeInserted(0,loadModel.size()-1);
             adapter.notifyItemChanged(0);
-            if(!chatModel.isEmpty()) chatRef.child(chat_id).child("messages").orderByKey().startAt(chatModel.get(0).getMessageId()).addChildEventListener(chatEventListener);
+            if(!chatModel.isEmpty()) {
+                chatRef.child(chat_id).child("messages").orderByKey().startAt(chatModel.get(0).getMessageId()).addChildEventListener(chatEventListener);
+            }else{
+                chatRef.child(chat_id).child("messages").addChildEventListener(chatEventListener);
+            }
             firstLoad = false;
             refreshLayout.setRefreshing(false);
             loadModel.clear();
@@ -263,14 +275,15 @@ public class ChatFragment extends BaseFragment {
 
         LayoutInflater inflater = LayoutInflater.from(context);
 
+        getParentActivity().getWindow().getDecorView().setSystemUiVisibility(0);
+
         fragmentView = new FrameLayout(context);
         View view = inflater.inflate(R.layout.activity_chat, (ViewGroup) fragmentView, false);
-        view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         recyclerview = view.findViewById(R.id.recyclerview1);
 
         ((ViewGroup) fragmentView).addView(view);
 
-        avatarCell = new ChatAvatarCell(context,this);
+        avatarCell = new ChatAvatarCell(context,this, chat_id);
         actionBar.createActionMode();
        // actionBar.setExtraHeight(AndroidUtilities.dp(6));
         ActionBarMenu menu = actionBar.createMenu();
@@ -284,10 +297,12 @@ public class ChatFragment extends BaseFragment {
 
         BackDrawable backButton = new BackDrawable(false);
         actionBar.setBackButtonDrawable(backButton);
+        actionBar.setBackgroundColor(Color.parseColor("#f05252"));
 
         initialize(view);
         initializeLogic();
         initKeyboardAnimation();
+        listenForTypingUpdates();
 
         fetchProfile();
 
@@ -300,9 +315,33 @@ public class ChatFragment extends BaseFragment {
                 }
             }
         });
-
-        getParentActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         return fragmentView;
+    }
+
+    private void listenForTypingUpdates() {
+        chatRef.child(chat_id).child("settings").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    String  status = snapshot.child(receiver_id).getValue(String.class);
+                    if(status != null) {
+                        if (status.equals("typing")) {
+                            avatarCell.setTypingAnimation(true);
+                        } else if (status.equals("default")) {
+                            avatarCell.setTypingAnimation(false);
+                        }
+                    }
+                }else{
+                    chatRef.child(chat_id).child("settings").child(UserConfig.getUid()).setValue("default");
+                    chatRef.child(chat_id).child("settings").child(receiver_id).setValue("default");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     public static String getName(){
@@ -334,6 +373,7 @@ public class ChatFragment extends BaseFragment {
     }
 
     private void initializeLogic() {
+        receiver_id = chat_id.replace(UserConfig.getUid(), "");
 
         toggleReplyLayout();
 
@@ -389,7 +429,7 @@ public class ChatFragment extends BaseFragment {
 //            }
 //            builder.setCustomView(layout);
 //            builder.create().show();
-
+            avatarCell.setTypingAnimation(true);
 
         });
 
@@ -413,6 +453,33 @@ public class ChatFragment extends BaseFragment {
         });
         message_edittext.setOnClickListener(ignore ->{
            // resizeView(root, root.getHeight(), AndroidUtilities.getScreenHeight() - 459);
+        });
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        Runnable typingCheck = () -> {
+            if (System.currentTimeMillis() > (last_text_edit + delay - 500)) {
+                chatRef.child(chat_id).child("settings").child(UserConfig.getUid()).setValue("default");
+            }
+        };
+
+        ((TextView)message_edittext).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                handler.removeCallbacks(typingCheck);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                    last_text_edit = System.currentTimeMillis();
+                    handler.postDelayed(typingCheck, delay);
+                    chatRef.child(chat_id).child("settings").child(UserConfig.getUid()).setValue("typing");
+            }
         });
     }
 
@@ -472,6 +539,10 @@ public class ChatFragment extends BaseFragment {
         layoutManager.setStackFromEnd(true);
         recyclerview.setLayoutManager(layoutManager);
 
+        textview_reply_name = view.findViewById(R.id.textview_reply_name);
+        textview_reply_message = view.findViewById(R.id.textview_reply_message);
+        btn_close_reply = view.findViewById(R.id.btn_close);
+
         chatModel = new ArrayList<MessagesModel>();
 
         adapter = new ChatAdapter(chatModel);
@@ -480,7 +551,7 @@ public class ChatFragment extends BaseFragment {
         SwipeController controller = new SwipeController(context, new ISwipeControllerActions(){
             @Override
             public void onSwipePerformed(int adapterPosition) {
-                textview_reply_name.setText(chatModel.get(adapterPosition).getUid().equals(UserConfig.getUid()) ? textview_chatname.getText() : "Replying to yourself");
+                textview_reply_name.setText(chatModel.get(adapterPosition).getUid().equals(UserConfig.getUid()) ? avatarCell.getTitleText() : "Replying to yourself");
                 textview_reply_message.setText(chatModel.get(adapterPosition).getMessage());
                 replySelected = adapterPosition;
                 if(!isReply){
@@ -506,10 +577,6 @@ public class ChatFragment extends BaseFragment {
         refreshLayout = view.findViewById(R.id.swiperefreshlayout);
         reply_layout = view.findViewById(R.id.reply_layout);
         rootView = view.findViewById(R.id.root);
-
-        textview_reply_name = view.findViewById(R.id.textview_reply_name);
-        textview_reply_message = view.findViewById(R.id.textview_reply_message);
-        btn_close_reply = view.findViewById(R.id.btn_close);
 
         emoji_button = view.findViewById(R.id.emoji_button);
         root = getParentActivity().getWindow().findViewById(android.R.id.content);
@@ -544,6 +611,8 @@ public class ChatFragment extends BaseFragment {
                  .setOnSoftKeyboardCloseListener(keyboardCloseListener)
                 .setKeyboardAnimationStyle(android.R.style.Animation)
                  .build(message_edittext);
+
+
     }
 
 
@@ -617,9 +686,17 @@ public class ChatFragment extends BaseFragment {
 
     @Override
     public void onFragmentDestroy() {
-        super.onFragmentDestroy();
+        AndroidUtilities.showToast("Destroy fragment");
+        NotificationCenter.getInstance().postNotificationName(NotificationCenter.closeChats);
         chatRef.removeEventListener(chatEventListener);
         chatQuery.removeEventListener(firstLoadEventListener);
         getParentActivity().getWindow().getDecorView().setOnApplyWindowInsetsListener(null);
+        super.onFragmentDestroy();
+    }
+
+
+    @Override
+    public void didReceivedNotification(int id, Object... args) {
+
     }
 }

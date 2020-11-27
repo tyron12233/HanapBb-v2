@@ -43,11 +43,11 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         this.chatModel = chatModel;
     }
     public void updateList(List<MessagesModel> newList){
-        DiffUtilCallback callback = new DiffUtilCallback(this.chatModel, newList);
-        DiffUtil.DiffResult result = DiffUtil.calculateDiff(callback,true);
+        //DiffUtilCallback callback = new DiffUtilCallback(this.chatModel, newList);
+        //DiffUtil.DiffResult result = DiffUtil.calculateDiff(callback,true);
         chatModel.clear();
         chatModel.addAll(newList);
-        result.dispatchUpdatesTo(this);
+        //result.dispatchUpdatesTo(this);
 
     }
     @NonNull

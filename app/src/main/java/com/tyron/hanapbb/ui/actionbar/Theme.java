@@ -24,9 +24,10 @@ public class Theme {
     public static final int ACTION_BAR_PICKER_SELECTOR_COLOR = 0xff3d3d3d;
     public static final int ACTION_BAR_WHITE_SELECTOR_COLOR = 0x40ffffff;
     public static final int ACTION_BAR_AUDIO_SELECTOR_COLOR = 0x2f000000;
-    public static final int ACTION_BAR_MODE_SELECTOR_COLOR = 0xfff0f0f0;
+    public static final int ACTION_BAR_MODE_SELECTOR_COLOR = 0x000000;
 
     private static Paint maskPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    public static Paint chat_statusPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     public static Drawable createBarSelectorDrawable(int color) {
         return createBarSelectorDrawable(color, true);

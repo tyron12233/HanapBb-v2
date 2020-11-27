@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "766757007322",
+    "firebase_url": "https://hanapbb-9fdba.firebaseio.com",
+    "project_id": "hanapbb-9fdba",
+    "storage_bucket": "hanapbb-9fdba.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:766757007322:android:4271cbf932904a3a7b5ae3",
+        "android_client_info": {
+          "package_name": "com.tyron.hanapbb"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "766757007322-ku0i23ki6kekaq0n9jjppba07b1kbq2r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTIPP5Coxmg79LacFm0NR87lZ157diSio"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "766757007322-ku0i23ki6kekaq0n9jjppba07b1kbq2r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

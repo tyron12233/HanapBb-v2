@@ -11,6 +11,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.tyron.hanapbb.ui.models.MessagesModel;
 import com.tyron.hanapbb.ui.models.UserModel;
@@ -49,6 +50,23 @@ public class UserConfig {
 
     public static String getUid(){
         return auth.getUid();
+    }
+
+    public static void updateStatus(){
+        myRef.child(getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot != null){
+                    myRef.child(getUid()).child("status").onDisconnect().setValue(ServerValue.TIMESTAMP);
+                    myRef.child(getUid()).child("status").setValue("online");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
 }

@@ -122,6 +122,7 @@ public class ProfileCreateActivity extends AppCompatActivity implements ProfileC
                                 if (task.isSuccessful()) {
                                     Toast.makeText(context, "Success!", Toast.LENGTH_LONG).show();
                                     startActivity(new Intent(context, LaunchActivity.class));
+                                    finish();
                                 }
                             }
                         });

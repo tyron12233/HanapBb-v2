@@ -1,20 +1,22 @@
 package com.tyron.hanapbb.ui.components;
 
 import android.os.Message;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
 
+import com.tyron.hanapbb.ui.models.ConversationsModel;
 import com.tyron.hanapbb.ui.models.MessagesModel;
 
 import java.util.List;
 
 public class DiffUtilCallback extends DiffUtil.Callback {
 
-    List<MessagesModel> oldMessages;
-    List<MessagesModel> newMessages;
+    List<ConversationsModel> oldMessages;
+    List<ConversationsModel> newMessages;
 
-    public DiffUtilCallback(List<MessagesModel> oldMessages, List<MessagesModel> newMessages){
+    public DiffUtilCallback(List<ConversationsModel> oldMessages, List<ConversationsModel> newMessages){
         this.oldMessages = oldMessages;
         this.newMessages = newMessages;
     }
@@ -30,12 +32,15 @@ public class DiffUtilCallback extends DiffUtil.Callback {
 
     @Override
     public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-        return oldMessages.get(oldItemPosition).equals(newMessages.get(newItemPosition));
+        return oldMessages.get(oldItemPosition).getLastUid().equals(newMessages.get(newItemPosition).getLastUid());
+        //return false;
     }
 
     @Override
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        return oldMessages.get(oldItemPosition).getMessage().equals(newMessages.get(newItemPosition).getMessage());
+        boolean s = oldMessages.get(oldItemPosition).getLastTime() == newMessages.get(newItemPosition).getLastTime();
+        Log.d("HanapBb/DiffUtil", "areContentsTheSame: " + s);
+        return s;
     }
 
     @Nullable

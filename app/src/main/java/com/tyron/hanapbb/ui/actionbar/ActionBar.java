@@ -5,6 +5,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -191,9 +192,9 @@ public class ActionBar extends FrameLayout {
         }
         titleTextView = new SimpleTextView(getContext());
         titleTextView.setGravity(Gravity.LEFT | Gravity.CENTER);
-        titleTextView.setTextColor(0xffffffff);
+        titleTextView.setTextColor(Color.parseColor("#000000"));
         titleTextView.setTextSize(32);
-//        titleTextView.getPaint().setFakeBoldText(true);
+        titleTextView.getPaint().setFakeBoldText(true);
         addView(titleTextView, 0, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT,
                 LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP));
     }

@@ -31,7 +31,7 @@ import com.tyron.hanapbb.ui.actionbar.Theme;
 import com.tyron.hanapbb.ui.adapters.BaseFragmentAdapter;
 import com.tyron.hanapbb.ui.cells.PhotoPickerAlbumsCell;
 import com.tyron.hanapbb.ui.components.LayoutHelper;
-import com.tyron.hanapbb.ui.components.PhotoPickerSearchCell;
+import com.tyron.hanapbb.ui.cells.PhotoPickerSearchCell;
 
 import java.util.ArrayList;
 import java.util.HashMap;
