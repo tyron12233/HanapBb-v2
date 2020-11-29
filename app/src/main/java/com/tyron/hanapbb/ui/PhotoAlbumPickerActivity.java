@@ -3,6 +3,7 @@ package com.tyron.hanapbb.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.text.TextUtils;
@@ -12,6 +13,7 @@ import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ListView;
@@ -51,7 +53,7 @@ public class PhotoAlbumPickerActivity extends BaseFragment
 
     public static int limitPickPhoto;
     public static String sHintOfPick;
-    public static boolean DarkTheme = true;
+    public static boolean DarkTheme = false;
 
     private ArrayList<MediaController.AlbumEntry> albumsSorted = null;
     private ArrayList<MediaController.AlbumEntry> videoAlbumsSorted = null;
@@ -113,8 +115,9 @@ public class PhotoAlbumPickerActivity extends BaseFragment
     @SuppressWarnings("unchecked")
     @Override
     public View createView(Context context) {
-        actionBar.setBackgroundColor(Theme.ACTION_BAR_MEDIA_PICKER_COLOR);
-        actionBar.setItemsBackgroundColor(Theme.ACTION_BAR_PICKER_SELECTOR_COLOR);
+        updateStatusBar();
+        actionBar.setBackgroundColor(Color.parseColor("#FFFFFF"));
+        actionBar.setItemsBackgroundColor(Color.parseColor("#000000"));
         actionBar.setBackButtonImage(R.drawable.ic_arrow_back);
         //actionBar.setBackText(context.getString(R.string.Cancel));
         actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
@@ -747,5 +750,13 @@ public class PhotoAlbumPickerActivity extends BaseFragment
         public boolean isEmpty() {
             return getCount() == 0;
         }
+    }
+    private void updateStatusBar(){
+        Window window = getParentActivity().getWindow();
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        window.setStatusBarColor(Color.TRANSPARENT);
+        window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
     }
 }

@@ -1,5 +1,7 @@
 package com.tyron.hanapbb.ui.models;
 
+import com.google.firebase.database.Exclude;
+
 public class MessagesModel
 {
     private String uid;
@@ -14,6 +16,9 @@ public class MessagesModel
 
     private int type;
     private String replyUid;
+    private String temporaryPhoto;
+    private boolean uploading;
+    private String photoUrl;
 
     public String getUid ()
     {
@@ -80,5 +85,28 @@ public class MessagesModel
     }
     public String getReplyUid(){
         return replyUid;
+    }
+
+    @Exclude
+    public String getTemporaryPhoto(){
+        return temporaryPhoto;
+    }
+    public void setTemporaryPhoto(String path) {
+        temporaryPhoto = path;
+    }
+    @Exclude
+    public void setUploading(boolean b) {
+        uploading = b;
+    }
+    @Exclude
+    public boolean isUploading(){
+        return uploading;
+    }
+
+    public String getPhotoUrl(){
+        return photoUrl;
+    }
+    public void setPhotoUrl(String photoUrl){
+        this.photoUrl = photoUrl;
     }
 }

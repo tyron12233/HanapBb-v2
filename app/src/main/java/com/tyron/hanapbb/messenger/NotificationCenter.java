@@ -6,8 +6,10 @@ import java.util.ArrayList;
 
 public class NotificationCenter {
 
+
     private static int totalEvents = 1;
 
+    public static int didClickConversation = totalEvents++;
     public static final int didReceivedNewMessages = totalEvents++;
     public static final int dialogsNeedReload = totalEvents++;
     public static final int closeChats = totalEvents++;

@@ -53,7 +53,7 @@ public class UserConfig {
     }
 
     public static void updateStatus(){
-        myRef.child(getUid()).addValueEventListener(new ValueEventListener() {
+        myRef.child(getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot != null){

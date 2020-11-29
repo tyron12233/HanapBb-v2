@@ -14,6 +14,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import com.tyron.hanapbb.BackgroundUpdateService;
 import com.tyron.hanapbb.R;
 import com.tyron.hanapbb.messenger.AndroidUtilities;
 import com.tyron.hanapbb.messenger.NotificationCenter;
@@ -51,6 +52,8 @@ public class HomeActivity extends AppCompatActivity implements ActionBarLayout.A
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_activity);
+
+//        startService(new Intent(this, BackgroundUpdateService.class ));
 
         FrameLayout container = findViewById(R.id.container);
         actionBarLayout = new ActionBarLayout(this);

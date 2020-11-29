@@ -22,8 +22,6 @@ public class MyApplication extends Application {
         applicationContext = this;
         AndroidUtilities.fillStatusBarHeight(applicationContext);
         applicationHandler = new Handler(applicationContext.getMainLooper());
-
-        if(UserConfig.getUid() != null) UserConfig.updateStatus();
     }
 
 }

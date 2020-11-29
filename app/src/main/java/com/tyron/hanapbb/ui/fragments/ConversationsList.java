@@ -1,5 +1,6 @@
 package com.tyron.hanapbb.ui.fragments;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -43,6 +44,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.tyron.hanapbb.R;
 import com.tyron.hanapbb.emoji.EmojiTextView;
 import com.tyron.hanapbb.messenger.AndroidUtilities;
+import com.tyron.hanapbb.messenger.MessageObject;
 import com.tyron.hanapbb.messenger.NotificationCenter;
 import com.tyron.hanapbb.messenger.UserConfig;
 import com.tyron.hanapbb.ui.HomeActivity;
@@ -70,7 +72,7 @@ import com.tyron.hanapbb.ui.models.UserModel;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ConversationsList extends BaseFragment {
+public class ConversationsList extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
 
     private Context context;
 
@@ -104,13 +106,14 @@ public class ConversationsList extends BaseFragment {
 
     @Override
     public boolean onFragmentCreate() {
-//        adapter.startListening();
+        NotificationCenter.getInstance().addObserver(this,NotificationCenter.didClickConversation);
 
         return super.onFragmentCreate();
     }
 
     @Override
     public void onFragmentDestroy() {
+        NotificationCenter.getInstance().removeObserver(this,NotificationCenter.didClickConversation);
         super.onFragmentDestroy();
     }
 
@@ -177,7 +180,7 @@ public class ConversationsList extends BaseFragment {
 
     private void initialize() {
 
-        conversationsRef.child(UserConfig.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        conversationsRef.child(UserConfig.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 listeners = new ValueEventListener[(int) snapshot.getChildrenCount()];
@@ -207,6 +210,7 @@ public class ConversationsList extends BaseFragment {
 
             final int finalI = i;
             listeners[i] = new ValueEventListener() {
+                @RequiresApi(api = Build.VERSION_CODES.N)
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     for(DataSnapshot ds : snapshot.getChildren()){
@@ -214,14 +218,45 @@ public class ConversationsList extends BaseFragment {
 
                         ConversationsModel conv = new ConversationsModel();
                         conv.setLastMessage(model.getMessage());
-                        conv.setLastTime(model.getTime());
-                        conv.setLastUid(model.getUid());
-                        conv.setUserId(keys.get(finalI).replace(UserConfig.getUid(), ""));
 
-                        if(adapterList.isEmpty() || adapterList.size() < keys.size() || adapterList.get(finalI) == null){
+                        if(model.getType() == MessageObject.CHAT_TYPE_PHOTO){
+                            conv.setLastMessage("Sent a photo. ");
+                        }
+                        conv.setLastTime(model.getTime());
+
+                        int j = 0;
+                        for(Iterator<ConversationsModel> iterator = adapterList.iterator(); iterator.hasNext();){
+                            ConversationsModel it = iterator.next();
+                            if(it.getLastUid().equals(conv.getLastUid())){
+                                conv.setLastUid(keys.get(j));
+                                conv.setUserId(keys.get(j).replace(UserConfig.getUid(), ""));
+                                break;
+                            }
+                            j++;
+                        }
+                        if(conv.getLastUid() == null || conv.getUserId() == null){
+
+                                conv.setLastUid(keys.get(finalI));
+                                conv.setUserId(keys.get(finalI).replace(UserConfig.getUid(), ""));
+                                j= finalI;
+
+                        }
+
+                        if(adapterList.isEmpty()){
                             adapterList.add(conv);
                         }else{
-                            adapterList.set(finalI, conv);
+                            if(j < adapterList.size() && adapterList.get(j) == null || adapterList.size() < keys.size()){
+                                adapterList.add(conv);
+                            }else{
+                            int k = 0;
+                            for(Iterator<ConversationsModel> iterator = adapterList.iterator(); iterator.hasNext();) {
+                                ConversationsModel it = iterator.next();
+                                if (it.getLastUid().equals(conv.getLastUid())) {
+                                    adapterList.set(k, conv);
+                                }
+                                k++;
+                            }
+                            }
                         }
 
                         if(adapterList.size() < keys.size() || adapterList.get(finalI) == null){
@@ -229,10 +264,11 @@ public class ConversationsList extends BaseFragment {
                         }else{
                             Collections.sort(adapterList, new Comparator<ConversationsModel>() {
                                 @Override
-                                public int compare(ConversationsModel o1, ConversationsModel o2) {
+                                public int compare(ConversationsModel o2, ConversationsModel o1) {
                                     return Long.compare(o1.getLastTime(),o2.getLastTime());
                                 }
                             });
+                            Collections.sort(keys, Comparator.comparing(item -> adapterList.indexOf(item)));
                             //((ConversationsListAdapter)list.getAdapter()).updateList(conversations_list);
                             list.getAdapter().notifyDataSetChanged();
                         }
@@ -250,6 +286,13 @@ public class ConversationsList extends BaseFragment {
 
         for(int i = 0; i < listeners.length; i++){
             chatRef.child(keys.get(i)).child("messages").limitToLast(1).addValueEventListener(listeners[i]);
+        }
+    }
+
+    @Override
+    public void didReceivedNotification(int id, Object... args) {
+        if(id == NotificationCenter.didClickConversation){
+            presentFragment(new ChatFragment((String) args[0]));
         }
     }
 

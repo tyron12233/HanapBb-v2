@@ -17,7 +17,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tyron.hanapbb.R;
+import com.tyron.hanapbb.messenger.NotificationCenter;
+import com.tyron.hanapbb.ui.actionbar.BaseFragment;
 import com.tyron.hanapbb.ui.components.DiffUtilCallback;
+import com.tyron.hanapbb.ui.fragments.ChatFragment;
 import com.tyron.hanapbb.ui.fragments.ConversationsList;
 import com.tyron.hanapbb.ui.models.ConversationsModel;
 import com.tyron.hanapbb.ui.models.UserModel;
@@ -32,6 +35,7 @@ public class ConversationsListAdapter extends RecyclerView.Adapter<Conversations
     private List<ConversationsModel> model;
     private FirebaseDatabase firebase = FirebaseDatabase.getInstance();
     private DatabaseReference ref = firebase.getReference("users");
+
 
     public ConversationsListAdapter(List<ConversationsModel> list){
         model = list;
@@ -57,6 +61,7 @@ public class ConversationsListAdapter extends RecyclerView.Adapter<Conversations
         final TextView textview_name = view.findViewById(R.id.textview_name);
         final TextView textview_message = view.findViewById(R.id.textview_lastmessage);
         final CircleImageView photo = view.findViewById(R.id.circleImageView);
+        final ViewGroup root = view.findViewById(R.id.root);
 
         if(model.get(position).getLastMessage() != null){
             textview_message.setText(model.get(position).getLastMessage());
@@ -76,7 +81,9 @@ public class ConversationsListAdapter extends RecyclerView.Adapter<Conversations
 
                 }
             });
-
+        root.setOnClickListener(ignore -> {
+            NotificationCenter.getInstance().postNotificationName(NotificationCenter.didClickConversation, model.get(position).getLastUid());
+        });
         }else {
             textview_name.setText("Loading");
         }

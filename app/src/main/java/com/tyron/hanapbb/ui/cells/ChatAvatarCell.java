@@ -30,6 +30,7 @@ import com.tyron.hanapbb.ui.ConversationsListActivity;
 import com.tyron.hanapbb.ui.actionbar.ActionBar;
 import com.tyron.hanapbb.ui.actionbar.SimpleTextView;
 import com.tyron.hanapbb.ui.actionbar.Theme;
+import com.tyron.hanapbb.ui.components.SendingFileDrawable;
 import com.tyron.hanapbb.ui.components.StatusDrawable;
 import com.tyron.hanapbb.ui.components.TypingDotsDrawable;
 import com.tyron.hanapbb.ui.fragments.ChatFragment;
@@ -88,7 +89,10 @@ public class ChatAvatarCell extends FrameLayout implements NotificationCenter.No
         addView(subtitleTextView);
 
         statusDrawables[0] = new TypingDotsDrawable(false);
+        statusDrawables[1] = new SendingFileDrawable(false);
+
         statusDrawables[0].setIsChat(true);
+        statusDrawables[1].setIsChat(true);
 
         listenForStatus();
     }
@@ -97,14 +101,13 @@ public class ChatAvatarCell extends FrameLayout implements NotificationCenter.No
         FirebaseUtilities.userRef.child(chat_id.replace(UserConfig.getUid(), "")).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot != null){
+                if(snapshot.child("status").exists()){
                     String status = String.valueOf(snapshot.child("status").getValue());
                     if(status.equals("online")){
                         setSubTitle("Online");
                     }else{
-                        String date = DateUtils.formatElapsedTime(Long.valueOf(status));
+                        String date = (String) DateUtils.getRelativeTimeSpanString(getContext(),Long.parseLong(status));
                         setSubTitle("Last seen "+  date);
-
                     }
                 }
             }
@@ -186,6 +189,16 @@ public class ChatAvatarCell extends FrameLayout implements NotificationCenter.No
 
     public String getTitleText(){
         return titleTextView.getText().toString();
+    }
+
+    public void setFileSendingAnimation(boolean start){
+        if(start){
+            subtitleTextView.setLeftDrawable(statusDrawables[1]);
+            statusDrawables[1].start();
+        }else{
+            subtitleTextView.setLeftDrawable(null);
+            statusDrawables[1].stop();
+        }
     }
 }
 

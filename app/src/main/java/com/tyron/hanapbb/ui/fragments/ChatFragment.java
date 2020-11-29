@@ -1,7 +1,9 @@
 package com.tyron.hanapbb.ui.fragments;
 
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -18,15 +20,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,12 +32,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.CodeBoy.MediaFacer.MediaFacer;
+import com.CodeBoy.MediaFacer.PictureGet;
+import com.CodeBoy.MediaFacer.mediaHolders.pictureContent;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
@@ -62,6 +64,7 @@ import com.tyron.hanapbb.messenger.AndroidUtilities;
 import com.tyron.hanapbb.messenger.MessageObject;
 import com.tyron.hanapbb.messenger.NotificationCenter;
 import com.tyron.hanapbb.messenger.UserConfig;
+import com.tyron.hanapbb.ui.PhotoAlbumPickerActivity;
 import com.tyron.hanapbb.ui.actionbar.ActionBar;
 import com.tyron.hanapbb.ui.actionbar.ActionBarMenu;
 import com.tyron.hanapbb.ui.actionbar.BackDrawable;
@@ -74,6 +77,7 @@ import com.tyron.hanapbb.ui.components.CubicBezierInterpolator;
 import com.tyron.hanapbb.ui.components.ISwipeControllerActions;
 import com.tyron.hanapbb.ui.components.LayoutHelper;
 import com.tyron.hanapbb.ui.components.MyItemAnimator;
+import com.tyron.hanapbb.ui.components.PickerBottomSheet;
 import com.tyron.hanapbb.ui.components.SwipeController;
 import com.tyron.hanapbb.ui.models.MessagesModel;
 import com.tyron.hanapbb.ui.models.UserModel;
@@ -102,6 +106,8 @@ public class ChatFragment extends BaseFragment implements NotificationCenter.Not
 
     long last_text_edit = 0;
     long delay = 1500;
+
+    PhotoAlbumPickerActivity photoAlbumPickerActivity;
 
 
     private TextView textview_chatname;
@@ -325,15 +331,16 @@ public class ChatFragment extends BaseFragment implements NotificationCenter.Not
                 if(snapshot.exists()){
                     String  status = snapshot.child(receiver_id).getValue(String.class);
                     if(status != null) {
-                        if (status.equals("typing")) {
+                        if (status.contains("typing")) {
                             avatarCell.setTypingAnimation(true);
-                        } else if (status.equals("default")) {
+                        }
+                        if(status.contains("uploading")) {
+                            avatarCell.setFileSendingAnimation(true);
+                        }
+                        if(status.equals("default")){
                             avatarCell.setTypingAnimation(false);
                         }
                     }
-                }else{
-                    chatRef.child(chat_id).child("settings").child(UserConfig.getUid()).setValue("default");
-                    chatRef.child(chat_id).child("settings").child(receiver_id).setValue("default");
                 }
             }
 
@@ -359,7 +366,6 @@ public class ChatFragment extends BaseFragment implements NotificationCenter.Not
                 if(model != null) {
                     chat_name = model.getName();
                     avatarCell.setTitle(chat_name);
-                    avatarCell.setSubTitle("Active now");
                     String url = model.getPhotoUrl();
                     avatarCell.setPicture(url);
                 }
@@ -388,19 +394,24 @@ public class ChatFragment extends BaseFragment implements NotificationCenter.Not
 //            picker.disableCamera(true);
 //            picker.show();
 
-//            BottomSheet.Builder builder = new BottomSheet.Builder(getContext());
-//            builder.setApplyTopPadding(false);
-//
-//
-//
-//            LinearLayout layout = new LinearLayout(getContext());
-//            layout.setOrientation(LinearLayout.VERTICAL);
-//
+            Intent intent = getParentActivity().getIntent();
+            photoAlbumPickerActivity = new PhotoAlbumPickerActivity(
+                    new String[]{"image/jpeg"},
+                    1,
+                    true,
+                    "Select a photo",
+                    false
+            );
+            photoAlbumPickerActivity.setDelegate(mPhotoAlbumPickerActivityDelegate);
+            presentFragment(photoAlbumPickerActivity,false,false);
+
+
 //
 //            BottomSheet.BottomSheetCell[] buttons = new BottomSheet.BottomSheetCell[5];
 //
 //            for (int a = 0; a < buttons.length; a++) {
-//                buttons[a] = new BottomSheet.BottomSheetCell(getContext(), 0);
+//                buttons[a] = new BottomSheet.BottomSheetCell(context, 0);
+//
 //                buttons[a].setPadding(AndroidUtilities.dp(7), 0, AndroidUtilities.dp(7), 0);
 //                buttons[a].setTag(a);
 //                //buttons[a].setBackgroundDrawable(Theme.getSelectorDrawable(false));
@@ -427,10 +438,6 @@ public class ChatFragment extends BaseFragment implements NotificationCenter.Not
 //                buttons[a].setTextAndIcon(text, 0);
 //                layout.addView(buttons[a], LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
 //            }
-//            builder.setCustomView(layout);
-//            builder.create().show();
-            avatarCell.setTypingAnimation(true);
-
         });
 
         refreshLayout.setOnRefreshListener(() -> {
@@ -458,7 +465,13 @@ public class ChatFragment extends BaseFragment implements NotificationCenter.Not
         Handler handler = new Handler(Looper.getMainLooper());
         Runnable typingCheck = () -> {
             if (System.currentTimeMillis() > (last_text_edit + delay - 500)) {
-                chatRef.child(chat_id).child("settings").child(UserConfig.getUid()).setValue("default");
+                adapter.setTypingStatus(false);
+                if(adapter.isUploading){
+                    chatRef.child(chat_id).child("settings").child(UserConfig.getUid()).setValue("uploading");
+                }else{
+                    chatRef.child(chat_id).child("settings").child(UserConfig.getUid()).setValue("default");
+                }
+
             }
         };
 
@@ -478,7 +491,12 @@ public class ChatFragment extends BaseFragment implements NotificationCenter.Not
 
                     last_text_edit = System.currentTimeMillis();
                     handler.postDelayed(typingCheck, delay);
-                    chatRef.child(chat_id).child("settings").child(UserConfig.getUid()).setValue("typing");
+                    adapter.setTypingStatus(true);
+                    if(adapter.isUploading){
+                        chatRef.child(chat_id).child("settings").child(UserConfig.getUid()).setValue("typing,uploading");
+                    }else {
+                        chatRef.child(chat_id).child("settings").child(UserConfig.getUid()).setValue("typing");
+                    }
             }
         });
     }
@@ -545,13 +563,13 @@ public class ChatFragment extends BaseFragment implements NotificationCenter.Not
 
         chatModel = new ArrayList<MessagesModel>();
 
-        adapter = new ChatAdapter(chatModel);
+        adapter = new ChatAdapter(chatModel, chat_id);
         recyclerview.setAdapter(adapter);
         recyclerview.setItemAnimator(new MyItemAnimator());
         SwipeController controller = new SwipeController(context, new ISwipeControllerActions(){
             @Override
             public void onSwipePerformed(int adapterPosition) {
-                textview_reply_name.setText(chatModel.get(adapterPosition).getUid().equals(UserConfig.getUid()) ? avatarCell.getTitleText() : "Replying to yourself");
+                textview_reply_name.setText(!chatModel.get(adapterPosition).getUid().equals(UserConfig.getUid()) ? avatarCell.getTitleText() : "Replying to yourself");
                 textview_reply_message.setText(chatModel.get(adapterPosition).getMessage());
                 replySelected = adapterPosition;
                 if(!isReply){
@@ -681,19 +699,47 @@ public class ChatFragment extends BaseFragment implements NotificationCenter.Not
     @Override
     protected void onTransitionAnimationEnd(boolean isOpen, boolean backward) {
         super.onTransitionAnimationEnd(isOpen, backward);
-        initRecycler();
+        if(adapter.getItemCount() == 1 || adapter.getItemCount() < 1 || adapter.getItemViewType(0) == adapter.VIEW_TYPE_EMPTY) {
+            initRecycler();
+        }
     }
 
     @Override
     public void onFragmentDestroy() {
-        AndroidUtilities.showToast("Destroy fragment");
-        NotificationCenter.getInstance().postNotificationName(NotificationCenter.closeChats);
-        chatRef.removeEventListener(chatEventListener);
-        chatQuery.removeEventListener(firstLoadEventListener);
-        getParentActivity().getWindow().getDecorView().setOnApplyWindowInsetsListener(null);
+     //   NotificationCenter.getInstance().removeObserver(this, NotificationCenter.);
         super.onFragmentDestroy();
     }
 
+    private PhotoAlbumPickerActivity.PhotoAlbumPickerActivityDelegate mPhotoAlbumPickerActivityDelegate = new PhotoAlbumPickerActivity.PhotoAlbumPickerActivityDelegate() {
+        @Override
+        public void didSelectPhotos(ArrayList<String> photos, ArrayList<String> captions) {
+            sendPhoto(photos.get(0));
+        }
+
+        @Override
+        public boolean didSelectVideo(String path) {
+           return false;
+        }
+
+        @Override
+        public void startPhotoSelectActivity() {
+        }
+    };
+
+    private void sendPhoto(String path) {
+        String message_id = chatRef.push().getKey();
+        MessagesModel model = new MessagesModel();
+        model.setType(MessageObject.CHAT_TYPE_PHOTO);
+        model.setReply(false);
+        model.setTime(System.currentTimeMillis());
+        model.setMessageId(message_id);
+        model.setUid(UserConfig.getUid());
+
+        model.setTemporaryPhoto(path);
+        model.setUploading(true);
+        chatModel.add(model);
+        adapter.notifyItemInserted(adapter.getItemCount() - 1);
+    }
 
     @Override
     public void didReceivedNotification(int id, Object... args) {

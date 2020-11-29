@@ -18,6 +18,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.auth.User;
 import com.tyron.hanapbb.R;
 import com.tyron.hanapbb.messenger.AndroidUtilities;
 import com.tyron.hanapbb.messenger.UserConfig;
@@ -131,6 +132,7 @@ public class LaunchActivity extends AppCompatActivity {
                     UserModel model = snapshot.getValue(UserModel.class);
                     UserConfig.config = model;
                     startActivity(new Intent(LaunchActivity.this, HomeActivity.class));
+                    UserConfig.updateStatus();
                 }else{
                     startActivity(new Intent(LaunchActivity.this, ProfileCreateActivity.class));
                 }

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -126,7 +127,7 @@ public class PhotoPickerActivity extends BaseFragment
     @SuppressWarnings("unchecked")
     @Override
     public View createView(Context context) {
-        actionBar.setBackgroundColor(Theme.ACTION_BAR_MEDIA_PICKER_COLOR);
+        actionBar.setBackgroundColor(Color.parseColor("#ffffff"));
         actionBar.setItemsBackgroundColor(Theme.ACTION_BAR_PICKER_SELECTOR_COLOR);
         actionBar.setBackButtonImage(R.drawable.ic_arrow_back);
         // actionBar.setBackText("返回");
@@ -150,7 +151,7 @@ public class PhotoPickerActivity extends BaseFragment
                 .createLinear(LayoutHelper.WRAP_CONTENT, -1);
         cancel.setTextSize(18);
         cancel.setText(R.string.Cancel);
-        cancel.setTextColor(0xffffffff);
+        cancel.setTextColor(Color.parseColor("#000000"));
         cancel.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
         cancelParams.setMargins(0, 0, AndroidUtilities.dp(8), 0);
         cancel.setLayoutParams(cancelParams);
@@ -756,6 +757,7 @@ public class PhotoPickerActivity extends BaseFragment
         } else {
             itemWidth = (AndroidUtilities.displaySize.x
                     - ((columnsCount + 1) * AndroidUtilities.dp(4))) / columnsCount;
+
         }
         listView.setColumnWidth(itemWidth);
 

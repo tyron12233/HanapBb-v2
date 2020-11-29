@@ -87,9 +87,9 @@ public class BackupImageView extends View {
         imageReceiver.setImageBitmap(getResources().getDrawable(resId));
     }
 
-    public void setImageDrawable(Drawable drawable) {
-        imageReceiver.setImageBitmap(drawable);
-    }
+//    public void setImageDrawable(int drawable) {
+//        imageReceiver.setImageBitmap(drawable);
+//    }
 
     public void setRoundRadius(int value) {
         imageReceiver.setRoundRadius(value);
