@@ -150,7 +150,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.recyclerview.widget.RecyclerView
+        <android.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview1"
             android:layout_width="0dp"
             android:layout_height="0dp"

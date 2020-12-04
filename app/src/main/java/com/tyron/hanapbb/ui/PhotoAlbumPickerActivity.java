@@ -57,9 +57,9 @@ public class PhotoAlbumPickerActivity extends BaseFragment
 
     private ArrayList<MediaController.AlbumEntry> albumsSorted = null;
     private ArrayList<MediaController.AlbumEntry> videoAlbumsSorted = null;
-    private HashMap<Integer, MediaController.PhotoEntry> selectedPhotos = new HashMap<>();
-    private HashMap<Integer, Integer> checkboxTag = new HashMap<>();
-    private List<MediaController.PhotoEntry> selectedPhotosSortEnd = new ArrayList<>();
+    private final HashMap<Integer, MediaController.PhotoEntry> selectedPhotos = new HashMap<>();
+    private final HashMap<Integer, Integer> checkboxTag = new HashMap<>();
+    private final List<MediaController.PhotoEntry> selectedPhotosSortEnd = new ArrayList<>();
     private boolean loading = false;
 
     private int columnsCount = 2;
@@ -71,8 +71,8 @@ public class PhotoAlbumPickerActivity extends BaseFragment
     private ActionBarMenuItem dropDownContainer;
     // private PickerBottomLayout pickerBottomLayout;
     private boolean sendPressed;
-    private boolean singlePhoto;
-    private boolean allowGifs;
+    private final boolean singlePhoto;
+    private final boolean allowGifs;
     private int selectedMode;
     private final String[] filterMimeTypes;
 
@@ -310,8 +310,8 @@ public class PhotoAlbumPickerActivity extends BaseFragment
 
     public class CustomProvider extends PhotoViewer.PreviewEmptyPhotoViewerProvider {
 
-        private MediaController.PhotoEntry[] selectArr;
-        private MediaController.PhotoEntry[] removedArr;
+        private final MediaController.PhotoEntry[] selectArr;
+        private final MediaController.PhotoEntry[] removedArr;
 
         public CustomProvider(List<Object> selectPhotos) {
             int size = selectPhotos.size();
@@ -623,7 +623,7 @@ public class PhotoAlbumPickerActivity extends BaseFragment
     }
 
     private class ListAdapter extends BaseFragmentAdapter {
-        private Context mContext;
+        private final Context mContext;
 
         public ListAdapter(Context context) {
             mContext = context;

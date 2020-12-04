@@ -41,7 +41,7 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable {
     private Bitmap backgroundBitmap;
     private boolean destroyWhenDone;
     private boolean decoderCreated;
-    private File path;
+    private final File path;
     private boolean recycleWithSecond;
 
     private BitmapShader renderingShader;
@@ -49,9 +49,9 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable {
     private BitmapShader backgroundShader;
 
     private int roundRadius;
-    private RectF roundRect = new RectF();
-    private RectF bitmapRect = new RectF();
-    private Matrix shaderMatrix = new Matrix();
+    private final RectF roundRect = new RectF();
+    private final RectF bitmapRect = new RectF();
+    private final Matrix shaderMatrix = new Matrix();
 
     private float scaleX = 1.0f;
     private float scaleY = 1.0f;
@@ -61,7 +61,7 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable {
     private volatile boolean isRunning;
     private volatile boolean isRecycled;
     private volatile int nativePtr;
-    private static ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2, new ThreadPoolExecutor.DiscardPolicy());
+    private static final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2, new ThreadPoolExecutor.DiscardPolicy());
 
     private View parentView = null;
     private View secondParentView = null;
@@ -77,7 +77,7 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable {
         }
     };
 
-    private Runnable uiRunnable = new Runnable() {
+    private final Runnable uiRunnable = new Runnable() {
         @Override
         public void run() {
             if (destroyWhenDone && nativePtr != 0) {
@@ -109,7 +109,7 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable {
         }
     };
 
-    private Runnable loadFrameRunnable = new Runnable() {
+    private final Runnable loadFrameRunnable = new Runnable() {
         @Override
         public void run() {
             if (!isRecycled) {

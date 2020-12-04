@@ -1,13 +1,11 @@
 package com.tyron.hanapbb.ui.components;
 
-import android.os.Message;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.DiffUtil;
+import android.recyclerview.widget.DiffUtil;
 
 import com.tyron.hanapbb.ui.models.ConversationsModel;
-import com.tyron.hanapbb.ui.models.MessagesModel;
 
 import java.util.List;
 

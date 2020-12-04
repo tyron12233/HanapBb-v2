@@ -10,7 +10,7 @@ import com.tyron.hanapbb.messenger.AndroidUtilities;
 
 public class SizeNotifierFrameLayoutPhoto extends FrameLayout {
 
-    private Rect rect = new Rect();
+    private final Rect rect = new Rect();
     private int keyboardHeight;
     private SizeNotifierFrameLayoutPhotoDelegate delegate;
     private WindowManager windowManager;

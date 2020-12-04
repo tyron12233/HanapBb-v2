@@ -91,11 +91,11 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     private FrameLayoutTouchListener windowView;
     private ClippingImageView animatingImageView;
     private FrameLayout bottomLayout;
-    private BackgroundDrawable backgroundDrawable = new BackgroundDrawable(0xff000000);
+    private final BackgroundDrawable backgroundDrawable = new BackgroundDrawable(0xff000000);
     private CheckBox checkImageView;
     private PickerBottomLayout pickerView;
     private PickerBottomLayout editorDoneLayout;
-    private RadialProgressView radialProgressViews[] = new RadialProgressView[3];
+    private final RadialProgressView[] radialProgressViews = new RadialProgressView[3];
     // private ActionBarMenuItem cropItem;
     private View indexItem;
     private AnimatorSet currentActionBarAnimation;
@@ -115,7 +115,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     private float videoCrossfadeAlpha;
     private long videoCrossfadeAlphaLastTime;
 
-    private float animationValues[][] = new float[2][8];
+    private final float[][] animationValues = new float[2][8];
 
     private int animationInProgress = 0;
     private long transitionAnimationStartTime = 0;
@@ -131,7 +131,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     private ImageReceiver rightImage = new ImageReceiver();
     private int currentIndex;
     private FileLocation currentFileLocation;
-    private String currentFileNames[] = new String[3];
+    private final String[] currentFileNames = new String[3];
     private PlaceProviderObject currentPlaceObject;
     private String currentPathObject;
     private Bitmap currentThumb = null;
@@ -144,7 +144,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     private boolean isFirstLoading;
     private boolean needSearchImageInArr;
     private boolean loadingMoreImages;
-    private boolean endReached[] = new boolean[]{
+    private final boolean[] endReached = new boolean[]{
             false, true
     };
     private boolean opennedFromMedia;
@@ -163,7 +163,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     private AnimatorSet imageMoveAnimation;
     private AnimatorSet changeModeAnimation;
     private GestureDetector gestureDetector;
-    private DecelerateInterpolator interpolator = new DecelerateInterpolator(1.5f);
+    private final DecelerateInterpolator interpolator = new DecelerateInterpolator(1.5f);
     private float pinchStartDistance;
     private float pinchStartScale = 1;
     private float pinchCenterX;
@@ -189,10 +189,10 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     private VelocityTracker velocityTracker = null;
     private Scroller scroller = null;
 
-    private ArrayList<FileLocation> imagesArrLocations = new ArrayList<>();
-    private ArrayList<Photo> avatarsArr = new ArrayList<>();
-    private ArrayList<Integer> imagesArrLocationsSizes = new ArrayList<>();
-    private ArrayList<Object> imagesArrLocals = new ArrayList<>();
+    private final ArrayList<FileLocation> imagesArrLocations = new ArrayList<>();
+    private final ArrayList<Photo> avatarsArr = new ArrayList<>();
+    private final ArrayList<Integer> imagesArrLocationsSizes = new ArrayList<>();
+    private final ArrayList<Object> imagesArrLocals = new ArrayList<>();
     private FileLocation currentUserAvatarLocation = null;
 
     private final static int gallery_menu_crop = 4;
@@ -236,10 +236,10 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         private float animationProgressStart = 0;
         private long currentProgressTime = 0;
         private float animatedProgressValue = 0;
-        private RectF progressRect = new RectF();
+        private final RectF progressRect = new RectF();
         private int backgroundState = -1;
         private View parent = null;
-        private int size = AndroidUtilities.dp(64);
+        private final int size = AndroidUtilities.dp(64);
         private int previousBackgroundState = -2;
         private float animatedAlphaValue = 1.0f;
         private float alpha = 1.0f;
@@ -819,9 +819,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             public boolean canOpenMenu() {
                 if (currentFileLocation != null) {
                     File f = FileLoader.getPathToAttach(currentFileLocation, avatarsDialogId != 0);
-                    if (f.exists()) {
-                        return true;
-                    }
+                    return f.exists();
                 }
                 return false;
             }
@@ -1337,7 +1335,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         return null;
     }
 
-    private FileLocation getFileLocation(int index, int size[]) {
+    private FileLocation getFileLocation(int index, int[] size) {
         if (index < 0) {
             return null;
         }
@@ -1692,7 +1690,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 imageReceiver.setImageBitmap((Bitmap) null);
             }
         } else {
-            int size[] = new int[1];
+            int[] size = new int[1];
             FileLocation fileLocation = getFileLocation(index, size);
 
             if (fileLocation != null) {
@@ -1850,7 +1848,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             int clipHorizontal = Math.abs(drawRegion.left - placeProviderObject.imageReceiver.getImageX());
             int clipVertical = Math.abs(drawRegion.top - placeProviderObject.imageReceiver.getImageY());
 
-            int coords2[] = new int[2];
+            int[] coords2 = new int[2];
             placeProviderObject.parentView.getLocationInWindow(coords2);
             int clipTop = coords2[1] - AndroidUtilities.statusBarHeight
                     - (placeProviderObject.viewY + drawRegion.top) + placeProviderObject.clipTopAddition;
@@ -2075,7 +2073,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 int clipHorizontal = Math.abs(drawRegion.left - object.imageReceiver.getImageX());
                 int clipVertical = Math.abs(drawRegion.top - object.imageReceiver.getImageY());
 
-                int coords2[] = new int[2];
+                int[] coords2 = new int[2];
                 object.parentView.getLocationInWindow(coords2);
                 int clipTop = coords2[1] - AndroidUtilities.statusBarHeight
                         - (object.viewY + drawRegion.top) + object.clipTopAddition;

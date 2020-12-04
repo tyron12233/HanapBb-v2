@@ -20,10 +20,10 @@ public class PhotoCropView extends FrameLayout {
     }
 
     private boolean freeformCrop = true;
-    private Paint rectPaint;
-    private Paint circlePaint;
-    private Paint halfPaint;
-    private Paint shadowPaint;
+    private final Paint rectPaint;
+    private final Paint circlePaint;
+    private final Paint halfPaint;
+    private final Paint shadowPaint;
     private float rectSizeX = 600;
     private float rectSizeY = 600;
     private int draggingState = 0;

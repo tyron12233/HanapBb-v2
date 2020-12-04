@@ -61,24 +61,24 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ImageLoader {
 
-    private HashMap<String, Integer> bitmapUseCounts = new HashMap<>();
-    private LruCache memCache;
-    private HashMap<String, CacheImage> imageLoadingByUrl = new HashMap<>();
-    private HashMap<String, CacheImage> imageLoadingByKeys = new HashMap<>();
-    private HashMap<Integer, CacheImage> imageLoadingByTag = new HashMap<>();
-    private HashMap<String, ThumbGenerateInfo> waitingForQualityThumb = new HashMap<>();
-    private HashMap<Integer, String> waitingForQualityThumbByTag = new HashMap<>();
-    private LinkedList<HttpImageTask> httpTasks = new LinkedList<>();
-    private DispatchQueue cacheOutQueue = new DispatchQueue("cacheOutQueue");
-    private DispatchQueue cacheThumbOutQueue = new DispatchQueue("cacheThumbOutQueue");
-    private DispatchQueue thumbGeneratingQueue = new DispatchQueue("thumbGeneratingQueue");
-    private DispatchQueue imageLoadQueue = new DispatchQueue("imageLoadQueue");
-    private ConcurrentHashMap<String, Float> fileProgresses = new ConcurrentHashMap<>();
-    private HashMap<String, ThumbGenerateTask> thumbGenerateTasks = new HashMap<>();
+    private final HashMap<String, Integer> bitmapUseCounts = new HashMap<>();
+    private final LruCache memCache;
+    private final HashMap<String, CacheImage> imageLoadingByUrl = new HashMap<>();
+    private final HashMap<String, CacheImage> imageLoadingByKeys = new HashMap<>();
+    private final HashMap<Integer, CacheImage> imageLoadingByTag = new HashMap<>();
+    private final HashMap<String, ThumbGenerateInfo> waitingForQualityThumb = new HashMap<>();
+    private final HashMap<Integer, String> waitingForQualityThumbByTag = new HashMap<>();
+    private final LinkedList<HttpImageTask> httpTasks = new LinkedList<>();
+    private final DispatchQueue cacheOutQueue = new DispatchQueue("cacheOutQueue");
+    private final DispatchQueue cacheThumbOutQueue = new DispatchQueue("cacheThumbOutQueue");
+    private final DispatchQueue thumbGeneratingQueue = new DispatchQueue("thumbGeneratingQueue");
+    private final DispatchQueue imageLoadQueue = new DispatchQueue("imageLoadQueue");
+    private final ConcurrentHashMap<String, Float> fileProgresses = new ConcurrentHashMap<>();
+    private final HashMap<String, ThumbGenerateTask> thumbGenerateTasks = new HashMap<>();
     private static byte[] bytes;
     private static byte[] bytesThumb;
-    private static byte[] header = new byte[12];
-    private static byte[] headerThumb = new byte[12];
+    private static final byte[] header = new byte[12];
+    private static final byte[] headerThumb = new byte[12];
 
     private String ignoreRemoval = null;
 
@@ -96,9 +96,9 @@ public class ImageLoader {
 
     private class HttpFileTask extends AsyncTask<Void, Void, Boolean> {
 
-        private String url;
-        private File tempFile;
-        private String ext;
+        private final String url;
+        private final File tempFile;
+        private final String ext;
         private RandomAccessFile fileOutputStream = null;
         private boolean canRetry = true;
 
@@ -429,10 +429,10 @@ public class ImageLoader {
 
     private class ThumbGenerateTask implements Runnable {
 
-        private File originalPath;
-        private int mediaType;
-        private FileLocation thumbLocation;
-        private String filter;
+        private final File originalPath;
+        private final int mediaType;
+        private final FileLocation thumbLocation;
+        private final String filter;
 
         public ThumbGenerateTask(int type, File path, FileLocation location, String f) {
             mediaType = type;
@@ -545,7 +545,7 @@ public class ImageLoader {
         private Thread runningThread;
         private final Object sync = new Object();
 
-        private CacheImage cacheImage;
+        private final CacheImage cacheImage;
         private boolean isCancelled;
 
         public CacheOutTask(CacheImage image) {
@@ -568,11 +568,15 @@ public class ImageLoader {
                         return;
                     }
                 }
-                AnimatedFileDrawable fileDrawable = new AnimatedFileDrawable(
-                        cacheImage.finalFilePath,
-                        cacheImage.filter != null && cacheImage.filter.equals("d"));
-                Thread.interrupted();
-                onPostExecute(fileDrawable);
+                try {
+                    AnimatedFileDrawable fileDrawable = new AnimatedFileDrawable(
+                            cacheImage.finalFilePath,
+                            cacheImage.filter != null && cacheImage.filter.equals("d"));
+                    Thread.interrupted();
+
+                    onPostExecute(fileDrawable);
+                }catch(UnsatisfiedLinkError ignore){}
+
             } else {
                 Long mediaId = null;
                 boolean mediaIsVideo = false;
@@ -732,7 +736,7 @@ public class ImageLoader {
                         float h_filter = 0;
                         boolean blur = false;
                         if (cacheImage.filter != null) {
-                            String args[] = cacheImage.filter.split("_");
+                            String[] args = cacheImage.filter.split("_");
                             if (args.length >= 2) {
                                 w_filter = Float.parseFloat(args[0]) * AndroidUtilities.density;
                                 h_filter = Float.parseFloat(args[1]) * AndroidUtilities.density;

@@ -10,7 +10,7 @@ import java.util.concurrent.CountDownLatch;
 public class DispatchQueue extends Thread {
 
     private volatile Handler handler = null;
-    private CountDownLatch syncLatch = new CountDownLatch(1);
+    private final CountDownLatch syncLatch = new CountDownLatch(1);
 
     public DispatchQueue(final String threadName) {
         setName(threadName);

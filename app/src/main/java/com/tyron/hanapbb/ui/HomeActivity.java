@@ -28,19 +28,9 @@ import com.tyron.hanapbb.ui.fragments.ConversationsList;
 import java.util.ArrayList;
 
 public class HomeActivity extends AppCompatActivity implements ActionBarLayout.ActionBarLayoutDelegate, NotificationCenter.NotificationCenterDelegate {
-
-    public static final String PHOTOS = "PHOTOS";
-    public static final String VIDEO = "VIDEOS";
-
-    private static final String GALLERY_CONFIG = "GALLERY_CONFIG";
-
     private ActionBarLayout actionBarLayout;
-    private TestActivity testActivity;
-    private PhotoAlbumPickerActivity albumPickerActivity;
 
-    private PickerBottomLayout pickerBottomLayout;
-
-    private ArrayList<BaseFragment> mainFragmentStack = new ArrayList<>();
+    private final ArrayList<BaseFragment> mainFragmentStack = new ArrayList<>();
 
     @Override
     public void onAttachedToWindow() {
@@ -64,8 +54,7 @@ public class HomeActivity extends AppCompatActivity implements ActionBarLayout.A
          actionBarLayout.init(mainFragmentStack);
          actionBarLayout.setDelegate(this);
 
-        //getSupportFragmentManager().beginTransaction().add(R.id.container, ConversationsList.newInstance()).commit();
-        String READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";
+         String READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";
 
         if (checkCallingOrSelfPermission(
                 READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -86,46 +75,14 @@ public class HomeActivity extends AppCompatActivity implements ActionBarLayout.A
     }
 
     private void showContent() {
-        Intent intent = getIntent();
-        albumPickerActivity = new PhotoAlbumPickerActivity(
-                new String[]{"image/jpeg"},
-                3,
-                false,
-                "Select a photo",
-                false
-        );
-
 
        // albumPickerActivity.setDelegate(mPhotoAlbumPickerActivityDelegate);
           actionBarLayout.presentFragment(new ConversationsList());
+      //  actionBarLayout.presentFragment(new SettingsActivity());
         //actionBarLayout.presentFragment(pickerBottomLayout);
        // actionBarLayout.presentFragment(albumPickerActivity,false,true,true);
     }
 
-    private PhotoAlbumPickerActivity.PhotoAlbumPickerActivityDelegate mPhotoAlbumPickerActivityDelegate = new PhotoAlbumPickerActivity.PhotoAlbumPickerActivityDelegate() {
-        @Override
-        public void didSelectPhotos(ArrayList<String> photos, ArrayList<String> captions) {
-            Intent intent = new Intent();
-            intent.putExtra(PHOTOS, photos);
-            setResult(Activity.RESULT_OK, intent);
-        }
-
-        @Override
-        public boolean didSelectVideo(String path) {
-            Intent intent = new Intent();
-            intent.putExtra(VIDEO, path);
-            setResult(Activity.RESULT_OK, intent);
-            return true;
-        }
-
-        @Override
-        public void startPhotoSelectActivity() {
-        }
-    };
-
-    public void replaceFragment(Fragment fragment){
-        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right, R.anim.slide_in_right, R.anim.slide_out_left).replace(R.id.container, fragment).addToBackStack(null).commit();
-    }
 
     @Override
     public boolean onPreIme() {

@@ -96,7 +96,7 @@ public class BottomSheet extends Dialog {
 
     protected boolean calcMandatoryInsets;
 
-    private int touchSlop;
+    private final int touchSlop;
     private boolean useFastDismiss;
     protected Interpolator openInterpolator = CubicBezierInterpolator.EASE_OUT_QUINT;
 
@@ -115,9 +115,9 @@ public class BottomSheet extends Dialog {
     private boolean applyTopPadding = true;
     private boolean applyBottomPadding = true;
 
-    private ArrayList<BottomSheetCell> itemViews = new ArrayList<>();
+    private final ArrayList<BottomSheetCell> itemViews = new ArrayList<>();
 
-    private Runnable dismissRunnable = this::dismiss;
+    private final Runnable dismissRunnable = this::dismiss;
 
     private BottomSheetDelegateInterface delegate;
 
@@ -141,10 +141,10 @@ public class BottomSheet extends Dialog {
         private boolean maybeStartTracking = false;
         private boolean startedTracking = false;
         private AnimatorSet currentAnimation = null;
-        private NestedScrollingParentHelper nestedScrollingParentHelper;
-        private Rect rect = new Rect();
+        private final NestedScrollingParentHelper nestedScrollingParentHelper;
+        private final Rect rect = new Rect();
         private int keyboardHeight;
-        private Paint backgroundPaint = new Paint();
+        private final Paint backgroundPaint = new Paint();
 
         public ContainerView(Context context) {
             super(context);
@@ -568,8 +568,8 @@ public class BottomSheet extends Dialog {
 
     public static class BottomSheetCell extends FrameLayout {
 
-        private TextView textView;
-        private ImageView imageView;
+        private final TextView textView;
+        private final ImageView imageView;
         int currentType;
 
         public BottomSheetCell(Context context, int type) {
@@ -1201,7 +1201,7 @@ public class BottomSheet extends Dialog {
 
     public static class Builder {
 
-        private BottomSheet bottomSheet;
+        private final BottomSheet bottomSheet;
 
         public Builder(Context context) {
             bottomSheet = new BottomSheet(context, false);

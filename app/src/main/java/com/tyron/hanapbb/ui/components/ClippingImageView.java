@@ -16,21 +16,21 @@ public class ClippingImageView extends View {
     private int clipRight;
     private int clipTop;
     private int orientation;
-    private RectF drawRect;
-    private Paint paint;
+    private final RectF drawRect;
+    private final Paint paint;
     private Bitmap bmp;
-    private Matrix matrix;
+    private final Matrix matrix;
 
     private boolean needRadius;
     private int radius;
     private BitmapShader bitmapShader;
-    private Paint roundPaint;
-    private RectF roundRect;
-    private RectF bitmapRect;
-    private Matrix shaderMatrix;
+    private final Paint roundPaint;
+    private final RectF roundRect;
+    private final RectF bitmapRect;
+    private final Matrix shaderMatrix;
 
     private float animationProgress;
-    private float animationValues[][];
+    private float[][] animationValues;
 
     public ClippingImageView(Context context) {
         super(context);

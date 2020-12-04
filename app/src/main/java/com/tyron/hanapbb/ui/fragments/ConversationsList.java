@@ -1,74 +1,45 @@
 package com.tyron.hanapbb.ui.fragments;
 
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Typeface;
-import android.os.Build;
-import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
-import androidx.paging.PagedList;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import android.provider.ContactsContract;
-import android.util.Log;
-import android.view.Gravity;
+import android.recyclerview.widget.LinearLayoutManager;
+import android.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.tyron.hanapbb.R;
-import com.tyron.hanapbb.emoji.EmojiTextView;
-import com.tyron.hanapbb.messenger.AndroidUtilities;
-import com.tyron.hanapbb.messenger.MessageObject;
 import com.tyron.hanapbb.messenger.NotificationCenter;
 import com.tyron.hanapbb.messenger.UserConfig;
-import com.tyron.hanapbb.ui.HomeActivity;
+import com.tyron.hanapbb.ui.ProfileActivity;
 import com.tyron.hanapbb.ui.SettingsActivity;
-import com.tyron.hanapbb.ui.actionbar.ActionBar;
-import com.tyron.hanapbb.ui.actionbar.ActionBarMenu;
 import com.tyron.hanapbb.ui.actionbar.BaseFragment;
 import com.tyron.hanapbb.ui.adapters.ConversationsListAdapter;
-import com.tyron.hanapbb.ui.components.LayoutHelper;
+import com.tyron.hanapbb.ui.models.ConversationsIdModel;
 import com.tyron.hanapbb.ui.models.ConversationsModel;
 
-import java.lang.reflect.Array;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DatabaseReference;
-import com.tyron.hanapbb.ui.models.MessagesModel;
-import com.tyron.hanapbb.ui.models.UserModel;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -76,27 +47,28 @@ public class ConversationsList extends BaseFragment implements NotificationCente
 
     private Context context;
 
-    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    private DatabaseReference conversationsRef = firebaseDatabase.getReference("conversations/");
-    private DatabaseReference profileRef = firebaseDatabase.getReference("users/");
-    private Query query = conversationsRef.child(UserConfig.getUid()).limitToLast(30);
-    private DatabaseReference chatRef = firebaseDatabase.getReference("chats");
+    private final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    private final DatabaseReference conversationsRef = firebaseDatabase.getReference("conversations/");
+    private final DatabaseReference profileRef = firebaseDatabase.getReference("users/");
+    private final Query query = conversationsRef.child(UserConfig.getUid()).limitToLast(30);
+    private final DatabaseReference chatRef = firebaseDatabase.getReference("chats");
 
     private CircleImageView avatar;
 
-    private FirebaseRecyclerOptions<ConversationsModel> options = new FirebaseRecyclerOptions.Builder<ConversationsModel>()
+    private final FirebaseRecyclerOptions<ConversationsModel> options = new FirebaseRecyclerOptions.Builder<ConversationsModel>()
             .setQuery(query,ConversationsModel.class).build();
 
     private RecyclerView list;
 
-    private List<ConversationsModel> conversations_list = new ArrayList<ConversationsModel>();
-    private List<ConversationsModel> adapterList = new ArrayList<>();
+    private final Set<ConversationsModel> conversations_list = new HashSet<ConversationsModel>();
+    private final List<ConversationsIdModel> adapterList = new ArrayList<>();
 
     private FloatingActionButton floatingActionButton;
 
     private ValueEventListener[] listeners;
-    private List<String> keys = new ArrayList<>();
+    private final List<String> keys = new ArrayList<>();
     private CircleImageView profile_imageview;
+    private ImageView settings_btn;
 
     public static ConversationsList newInstance() {
         return new ConversationsList();
@@ -185,10 +157,10 @@ public class ConversationsList extends BaseFragment implements NotificationCente
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 listeners = new ValueEventListener[(int) snapshot.getChildrenCount()];
                 for(DataSnapshot ds : snapshot.getChildren()) {
-                    String chat_id = ds.child("chat_id").getValue(String.class);
-                    keys.add(chat_id);
+                   ConversationsIdModel idModel = ds.getValue(ConversationsIdModel.class);
+                   adapterList.add(idModel);
+                   list.getAdapter().notifyDataSetChanged();
                 }
-                retrieveConversations();
             }
 
             @Override
@@ -201,92 +173,13 @@ public class ConversationsList extends BaseFragment implements NotificationCente
         });
         String url = UserConfig.config.getPhotoUrl();
         Glide.with(context).load(url).into(profile_imageview);
+        settings_btn = fragmentView.findViewById(R.id.imageView3);
 
-    }
-
-    private void retrieveConversations() {
-
-        for(int i = 0; i < listeners.length; i++){
-
-            final int finalI = i;
-            listeners[i] = new ValueEventListener() {
-                @RequiresApi(api = Build.VERSION_CODES.N)
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    for(DataSnapshot ds : snapshot.getChildren()){
-                        MessagesModel model = ds.getValue(MessagesModel.class);
-
-                        ConversationsModel conv = new ConversationsModel();
-                        conv.setLastMessage(model.getMessage());
-
-                        if(model.getType() == MessageObject.CHAT_TYPE_PHOTO){
-                            conv.setLastMessage("Sent a photo. ");
-                        }
-                        conv.setLastTime(model.getTime());
-
-                        int j = 0;
-                        for(Iterator<ConversationsModel> iterator = adapterList.iterator(); iterator.hasNext();){
-                            ConversationsModel it = iterator.next();
-                            if(it.getLastUid().equals(conv.getLastUid())){
-                                conv.setLastUid(keys.get(j));
-                                conv.setUserId(keys.get(j).replace(UserConfig.getUid(), ""));
-                                break;
-                            }
-                            j++;
-                        }
-                        if(conv.getLastUid() == null || conv.getUserId() == null){
-
-                                conv.setLastUid(keys.get(finalI));
-                                conv.setUserId(keys.get(finalI).replace(UserConfig.getUid(), ""));
-                                j= finalI;
-
-                        }
-
-                        if(adapterList.isEmpty()){
-                            adapterList.add(conv);
-                        }else{
-                            if(j < adapterList.size() && adapterList.get(j) == null || adapterList.size() < keys.size()){
-                                adapterList.add(conv);
-                            }else{
-                            int k = 0;
-                            for(Iterator<ConversationsModel> iterator = adapterList.iterator(); iterator.hasNext();) {
-                                ConversationsModel it = iterator.next();
-                                if (it.getLastUid().equals(conv.getLastUid())) {
-                                    adapterList.set(k, conv);
-                                }
-                                k++;
-                            }
-                            }
-                        }
-
-                        if(adapterList.size() < keys.size() || adapterList.get(finalI) == null){
-                            list.getAdapter().notifyDataSetChanged();
-                        }else{
-                            Collections.sort(adapterList, new Comparator<ConversationsModel>() {
-                                @Override
-                                public int compare(ConversationsModel o2, ConversationsModel o1) {
-                                    return Long.compare(o1.getLastTime(),o2.getLastTime());
-                                }
-                            });
-                            Collections.sort(keys, Comparator.comparing(item -> adapterList.indexOf(item)));
-                            //((ConversationsListAdapter)list.getAdapter()).updateList(conversations_list);
-                            list.getAdapter().notifyDataSetChanged();
-                        }
-                    }
-                    conversations_list.clear();
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            };
-
-        }
-
-        for(int i = 0; i < listeners.length; i++){
-            chatRef.child(keys.get(i)).child("messages").limitToLast(1).addValueEventListener(listeners[i]);
-        }
+        settings_btn.setOnClickListener(ignore -> {
+            ProfileActivity fragment = new ProfileActivity();
+            fragment.setProfileDetails(UserConfig.config);
+            presentFragment(fragment);
+        });
     }
 
     @Override

@@ -68,15 +68,15 @@ public class PhotoPickerActivity extends BaseFragment
         void openPreview();
     }
 
-    private int type;
-    private HashMap<Integer, MediaController.PhotoEntry> selectedPhotos;
+    private final int type;
+    private final HashMap<Integer, MediaController.PhotoEntry> selectedPhotos;
     private ArrayList<MediaController.SearchImage> recentImages;
 
-    private ArrayList<MediaController.SearchImage> searchResult = new ArrayList<>();
+    private final ArrayList<MediaController.SearchImage> searchResult = new ArrayList<>();
 
     private boolean searching;
     private String nextSearchBingString;
-    private boolean giphySearchEndReached = true;
+    private final boolean giphySearchEndReached = true;
     private String lastSearchString;
     private boolean loadingRecent;
     private int nextGiphySearchOffset;
@@ -84,7 +84,7 @@ public class PhotoPickerActivity extends BaseFragment
     private int lastSearchToken;
     private final int limitPickPhoto;
 
-    private MediaController.AlbumEntry selectedAlbum;
+    private final MediaController.AlbumEntry selectedAlbum;
 
     private GridView listView;
     private ListAdapter listAdapter;
@@ -432,7 +432,7 @@ public class PhotoPickerActivity extends BaseFragment
     public PhotoViewer.PlaceProviderObject getPlaceForPhoto(FileLocation fileLocation, int index) {
         PhotoPickerPhotoCell cell = getCellForIndex(index);
         if (cell != null) {
-            int coords[] = new int[2];
+            int[] coords = new int[2];
             cell.photoImage.getLocationInWindow(coords);
             PhotoViewer.PlaceProviderObject object = new PhotoViewer.PlaceProviderObject();
             object.viewX = coords[0];
@@ -772,7 +772,7 @@ public class PhotoPickerActivity extends BaseFragment
     }
 
     private class ListAdapter extends BaseFragmentAdapter {
-        private Context mContext;
+        private final Context mContext;
 
         public ListAdapter(Context context) {
             mContext = context;

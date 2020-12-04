@@ -1,13 +1,11 @@
 package com.tyron.hanapbb.ui.fragments;
 
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -28,21 +26,14 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearSmoothScroller;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import android.recyclerview.widget.ItemTouchHelper;
+import android.recyclerview.widget.LinearSmoothScroller;
+import android.recyclerview.widget.RecyclerView;
+import android.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.CodeBoy.MediaFacer.MediaFacer;
-import com.CodeBoy.MediaFacer.PictureGet;
-import com.CodeBoy.MediaFacer.mediaHolders.pictureContent;
-import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -52,7 +43,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import com.google.firebase.firestore.auth.User;
 import com.opensooq.supernova.gligar.GligarPicker;
 import com.tyron.hanapbb.R;
 import com.tyron.hanapbb.emoji.EmojiEditText;
@@ -70,14 +60,13 @@ import com.tyron.hanapbb.ui.actionbar.ActionBarMenu;
 import com.tyron.hanapbb.ui.actionbar.BackDrawable;
 import com.tyron.hanapbb.ui.actionbar.BaseFragment;
 import com.tyron.hanapbb.ui.actionbar.MenuDrawable;
+import com.tyron.hanapbb.ui.actionbar.Theme;
 import com.tyron.hanapbb.ui.adapters.ChatAdapter;
-import com.tyron.hanapbb.ui.actionbar.BottomSheet;
 import com.tyron.hanapbb.ui.cells.ChatAvatarCell;
 import com.tyron.hanapbb.ui.components.CubicBezierInterpolator;
 import com.tyron.hanapbb.ui.components.ISwipeControllerActions;
 import com.tyron.hanapbb.ui.components.LayoutHelper;
 import com.tyron.hanapbb.ui.components.MyItemAnimator;
-import com.tyron.hanapbb.ui.components.PickerBottomSheet;
 import com.tyron.hanapbb.ui.components.SwipeController;
 import com.tyron.hanapbb.ui.models.MessagesModel;
 import com.tyron.hanapbb.ui.models.UserModel;
@@ -87,12 +76,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import de.hdodenhof.circleimageview.CircleImageView;
-
 public class ChatFragment extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
 
     private Context context;
-    private GligarPicker picker = new GligarPicker();
+    private final GligarPicker picker = new GligarPicker();
     private RecyclerView recyclerview;
 
     private final List<MessagesModel> loadModel = new ArrayList<MessagesModel>();
@@ -106,6 +93,8 @@ public class ChatFragment extends BaseFragment implements NotificationCenter.Not
 
     long last_text_edit = 0;
     long delay = 1500;
+
+    private UserModel receiverModel;
 
     PhotoAlbumPickerActivity photoAlbumPickerActivity;
 
@@ -127,7 +116,7 @@ public class ChatFragment extends BaseFragment implements NotificationCenter.Not
     private ConstraintLayout reply_layout;
     private ConstraintLayout rootView;
 
-    private boolean isUser = false;
+    private final boolean isUser = false;
     private boolean firstLoad = true;
     private boolean isReply = true;
     private boolean debugMode;
@@ -199,6 +188,19 @@ public class ChatFragment extends BaseFragment implements NotificationCenter.Not
                     } else {
                         if (addedMessage.getTime() > prevMessage.getTime()) {
                             chatModel.add(addedMessage);
+
+                            RecyclerView.SmoothScroller smoothScroller = new LinearSmoothScroller(context) {
+                                @Override
+                                protected float calculateSpeedPerPixel(DisplayMetrics displayMetrics) {
+                                    return super.calculateSpeedPerPixel(displayMetrics)- 0.5f;
+                                }
+                            };
+                            smoothScroller.setTargetPosition(adapter.getItemCount() > 1? adapter.getItemCount() - 1 : 0 );
+                            if(((LinearLayoutManager)recyclerview.getLayoutManager()).findLastCompletelyVisibleItemPosition() > adapter.getItemCount() - 4){
+                                recyclerview.getLayoutManager().startSmoothScroll(smoothScroller);
+                              //  recyclerview.getLayoutManager().smoothScrollToPosition(recyclerview, new RecyclerView.State(), adapter.getItemCount()-1);
+                            }
+
                             adapter.notifyItemInserted(adapter.getItemCount() + 1);
                             adapter.notifyItemChanged(adapter.getItemCount() - 2);
                         }
@@ -276,6 +278,7 @@ public class ChatFragment extends BaseFragment implements NotificationCenter.Not
     @Override
     public View createView(Context context) {
 
+        Theme.createCommonResources(context);
 
         this.context = context;
 
@@ -289,7 +292,7 @@ public class ChatFragment extends BaseFragment implements NotificationCenter.Not
 
         ((ViewGroup) fragmentView).addView(view);
 
-        avatarCell = new ChatAvatarCell(context,this, chat_id);
+        avatarCell = new ChatAvatarCell(context,this, chat_id, receiverModel);
         actionBar.createActionMode();
        // actionBar.setExtraHeight(AndroidUtilities.dp(6));
         ActionBarMenu menu = actionBar.createMenu();
@@ -304,6 +307,10 @@ public class ChatFragment extends BaseFragment implements NotificationCenter.Not
         BackDrawable backButton = new BackDrawable(false);
         actionBar.setBackButtonDrawable(backButton);
         actionBar.setBackgroundColor(Color.parseColor("#f05252"));
+
+        actionBar.createActionMode();
+
+        avatarCell.setOnClickListener(ignore -> avatarCell.clicked());
 
         initialize(view);
         initializeLogic();
@@ -362,6 +369,7 @@ public class ChatFragment extends BaseFragment implements NotificationCenter.Not
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 UserModel model = snapshot.getValue(UserModel.class);
+                avatarCell.setUserModel(model);
 
                 if(model != null) {
                     chat_name = model.getName();
@@ -532,7 +540,7 @@ public class ChatFragment extends BaseFragment implements NotificationCenter.Not
 
                 @Override
                 protected float calculateSpeedPerPixel(DisplayMetrics displayMetrics) {
-                    return message_edittext.getText().length() > 50? 0.001f : 0.6f;
+                    return super.calculateSpeedPerPixel(displayMetrics) - 0.3f;
                 }
             };
 
@@ -699,7 +707,7 @@ public class ChatFragment extends BaseFragment implements NotificationCenter.Not
     @Override
     protected void onTransitionAnimationEnd(boolean isOpen, boolean backward) {
         super.onTransitionAnimationEnd(isOpen, backward);
-        if(adapter.getItemCount() == 1 || adapter.getItemCount() < 1 || adapter.getItemViewType(0) == adapter.VIEW_TYPE_EMPTY) {
+        if(adapter.getItemCount() == 1 || adapter.getItemCount() < 1 || adapter.getItemViewType(0) == ChatAdapter.VIEW_TYPE_EMPTY) {
             initRecycler();
         }
     }
@@ -710,7 +718,7 @@ public class ChatFragment extends BaseFragment implements NotificationCenter.Not
         super.onFragmentDestroy();
     }
 
-    private PhotoAlbumPickerActivity.PhotoAlbumPickerActivityDelegate mPhotoAlbumPickerActivityDelegate = new PhotoAlbumPickerActivity.PhotoAlbumPickerActivityDelegate() {
+    private final PhotoAlbumPickerActivity.PhotoAlbumPickerActivityDelegate mPhotoAlbumPickerActivityDelegate = new PhotoAlbumPickerActivity.PhotoAlbumPickerActivityDelegate() {
         @Override
         public void didSelectPhotos(ArrayList<String> photos, ArrayList<String> captions) {
             sendPhoto(photos.get(0));

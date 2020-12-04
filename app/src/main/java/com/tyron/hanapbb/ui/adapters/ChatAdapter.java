@@ -19,13 +19,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+import android.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -39,7 +38,6 @@ import com.tyron.hanapbb.R;
 import com.tyron.hanapbb.emoji.EmojiTextView;
 import com.tyron.hanapbb.emoji.EmojiUtils;
 import com.tyron.hanapbb.messenger.AndroidUtilities;
-import com.tyron.hanapbb.messenger.FirebaseUtilities;
 import com.tyron.hanapbb.messenger.UserConfig;
 import com.tyron.hanapbb.ui.components.LayoutHelper;
 import com.tyron.hanapbb.ui.fragments.ChatFragment;
@@ -55,12 +53,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     public List<MessagesModel> chatModel;
     private MessagesModel model;
-    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    private final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference chatRef = firebaseDatabase.getReference("chats");
-    private FirebaseStorage storage = FirebaseStorage.getInstance();
+    private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private StorageReference storageRef = storage.getReference("chats");
 
-    private String chat_id;
+    private final String chat_id;
 
     public boolean isUploading;
     public boolean isTyping;
@@ -191,7 +189,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                         //upload task
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         Bitmap bitmap = BitmapFactory.decodeFile(currentMessage.getTemporaryPhoto());
-                        bitmap.compress(Bitmap.CompressFormat.JPEG,20,baos);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG,40,baos);
                         byte[] data = baos.toByteArray();
 
                         UploadTask uploadTask = storageRef.putBytes(data);

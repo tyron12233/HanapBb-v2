@@ -1,28 +1,20 @@
 package com.tyron.hanapbb.ui;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.view.ContextMenu;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-import androidx.recyclerview.widget.RecyclerView;
+import android.recyclerview.widget.RecyclerView;
 
 import com.tyron.hanapbb.R;
-import com.tyron.hanapbb.messenger.AndroidUtilities;
 import com.tyron.hanapbb.messenger.NotificationCenter;
 import com.tyron.hanapbb.ui.actionbar.ActionBar;
 import com.tyron.hanapbb.ui.actionbar.ActionBarMenu;
 import com.tyron.hanapbb.ui.actionbar.ActionBarMenuItem;
 import com.tyron.hanapbb.ui.actionbar.BaseFragment;
-import com.tyron.hanapbb.ui.cells.ChatAvatarCell;
-import com.tyron.hanapbb.ui.components.LayoutHelper;
-import com.tyron.hanapbb.ui.fragments.ChatFragment;
 
 public class ConversationsListActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
 

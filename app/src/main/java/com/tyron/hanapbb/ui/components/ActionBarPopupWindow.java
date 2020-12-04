@@ -27,7 +27,7 @@ public class ActionBarPopupWindow extends PopupWindow {
 
     private static final Field superListenerField;
     private static final boolean animationEnabled = Build.VERSION.SDK_INT >= 18;
-    private static DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator();
+    private static final DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator();
     private AnimatorSet windowAnimatorSet;
     static {
         Field f = null;
@@ -63,10 +63,10 @@ public class ActionBarPopupWindow extends PopupWindow {
         private int backAlpha = 255;
         private int lastStartedChild = 0;
         private boolean showedFromBotton;
-        private HashMap<View, Integer> positions = new HashMap<>();
+        private final HashMap<View, Integer> positions = new HashMap<>();
 
         private ScrollView scrollView;
-        private LinearLayout linearLayout;
+        private final LinearLayout linearLayout;
 
         public ActionBarPopupWindowLayout(Context context) {
             super(context);

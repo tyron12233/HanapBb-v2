@@ -28,10 +28,10 @@ import java.util.List;
 
 public class BackgroundUpdateService extends Service {
 
-    private List<String> keys = new ArrayList<>();
-    private FirebaseDatabase firebase = FirebaseDatabase.getInstance();
-    private DatabaseReference convRef = firebase.getReference("conversations");
-    private DatabaseReference chatRef = firebase.getReference("chats");
+    private final List<String> keys = new ArrayList<>();
+    private final FirebaseDatabase firebase = FirebaseDatabase.getInstance();
+    private final DatabaseReference convRef = firebase.getReference("conversations");
+    private final DatabaseReference chatRef = firebase.getReference("chats");
     private ValueEventListener[] listeners;
 
     @Nullable

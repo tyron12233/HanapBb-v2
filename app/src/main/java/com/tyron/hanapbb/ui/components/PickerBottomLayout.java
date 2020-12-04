@@ -20,7 +20,7 @@ public class PickerBottomLayout extends FrameLayout {
     public TextView doneButtonTextView;
     public TextView doneButtonBadgeTextView;
 
-    private boolean isDarkTheme;
+    private final boolean isDarkTheme;
 
     public PickerBottomLayout(Context context) {
         this(context, true);

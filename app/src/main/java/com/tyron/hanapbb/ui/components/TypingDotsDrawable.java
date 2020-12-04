@@ -15,14 +15,14 @@ import com.tyron.hanapbb.ui.actionbar.Theme;
 
 public class TypingDotsDrawable extends StatusDrawable {
 
-    private int currentAccount = 1;
+    private final int currentAccount = 1;
     private boolean isChat = false;
-    private float[] scales = new float[3];
-    private float[] startTimes = new float[] {0, 150, 300};
-    private float[] elapsedTimes = new float[] {0, 0, 0};
+    private final float[] scales = new float[3];
+    private final float[] startTimes = new float[] {0, 150, 300};
+    private final float[] elapsedTimes = new float[] {0, 0, 0};
     private long lastUpdateTime = 0;
     private boolean started = false;
-    private DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator();
+    private final DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator();
 
     private Paint currentPaint;
 

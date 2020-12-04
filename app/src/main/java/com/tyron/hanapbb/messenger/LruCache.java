@@ -20,7 +20,7 @@ public class LruCache {
 
     /** Size of this cache in units. Not necessarily the number of elements. */
     private int size;
-    private int maxSize;
+    private final int maxSize;
 
     /**
      * @param maxSize for caches that do not override {@link #sizeOf}, this is

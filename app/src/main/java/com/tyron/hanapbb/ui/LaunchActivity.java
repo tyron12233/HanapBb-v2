@@ -29,8 +29,8 @@ import java.util.Objects;
 
 public class LaunchActivity extends AppCompatActivity {
 
-    private FirebaseDatabase _firebase = FirebaseDatabase.getInstance();
-    private DatabaseReference databaseReference = _firebase.getReference("updates/");
+    private final FirebaseDatabase _firebase = FirebaseDatabase.getInstance();
+    private final DatabaseReference databaseReference = _firebase.getReference("updates/");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +40,9 @@ public class LaunchActivity extends AppCompatActivity {
         version.setRequired(true);
         version.setMessage("Initial relese");
         version.setVersion(1.0f);
-        databaseReference.child("latest_update").setValue(version);;
+        databaseReference.child("latest_update").setValue(version);
 
-            if(AndroidUtilities.isNetworkAvailable(this)) {
+        if(AndroidUtilities.isNetworkAvailable(this)) {
                 checkLatestVersion();
             }else {
                 //TODO: offline code

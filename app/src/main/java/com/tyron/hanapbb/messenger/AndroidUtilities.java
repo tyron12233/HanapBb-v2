@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.ConnectivityManager;
@@ -24,6 +25,7 @@ import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.EdgeEffect;
@@ -49,9 +51,11 @@ public class  AndroidUtilities {
     public static boolean usingHardwareInput;
     public static boolean isInMultiwindow;
     public static int leftBaseline;
-    private static Boolean isTablet = false;
+    private static final Boolean isTablet = false;
     private static Field mAttachInfoField;
     private static Field mStableInsetsField;
+
+    public static DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator();
 
     private static Toast toast;
 
@@ -485,5 +489,25 @@ public class  AndroidUtilities {
         if (resourceId > 0) {
             AndroidUtilities.statusBarHeight = context.getResources().getDimensionPixelSize(resourceId);
         }
+    }
+    public static float lerp(float a, float b, float f) {
+        return a + f * (b - a);
+    }
+
+    public static float lerp(float[] ab, float f) {
+        return lerp(ab[0], ab[1], f);
+    }
+
+
+    public static int getOffsetColor(int color1, int color2, float offset, float alpha) {
+        int rF = Color.red(color2);
+        int gF = Color.green(color2);
+        int bF = Color.blue(color2);
+        int aF = Color.alpha(color2);
+        int rS = Color.red(color1);
+        int gS = Color.green(color1);
+        int bS = Color.blue(color1);
+        int aS = Color.alpha(color1);
+        return Color.argb((int) ((aS + (aF - aS) * offset) * alpha), (int) (rS + (rF - rS) * offset), (int) (gS + (gF - gS) * offset), (int) (bS + (bF - bS) * offset));
     }
 }

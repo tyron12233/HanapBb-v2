@@ -12,15 +12,15 @@ import com.tyron.hanapbb.messenger.AndroidUtilities;
 
 public class BackDrawable extends Drawable {
 
-    private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private boolean reverseAngle = false;
     private long lastFrameTime;
     private boolean animationInProgress;
     private float finalRotation;
     private float currentRotation;
     private int currentAnimationTime;
-    private boolean alwaysClose;
-    private DecelerateInterpolator interpolator = new DecelerateInterpolator();
+    private final boolean alwaysClose;
+    private final DecelerateInterpolator interpolator = new DecelerateInterpolator();
 
     public BackDrawable(boolean close) {
         super();

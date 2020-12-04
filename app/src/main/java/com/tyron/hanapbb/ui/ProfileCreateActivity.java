@@ -29,10 +29,10 @@ import com.tyron.hanapbb.ui.fragments.ProfileCreateFragment;
 
 public class ProfileCreateActivity extends AppCompatActivity implements ProfileCreateFragment.onGenderSelectedListener{
 
-    private FirebaseStorage profile = FirebaseStorage.getInstance();
-    private StorageReference up = profile.getReference("users");
-    private FirebaseDatabase _firebase = FirebaseDatabase.getInstance();
-    private DatabaseReference ref = _firebase.getReference("users");
+    private final FirebaseStorage profile = FirebaseStorage.getInstance();
+    private final StorageReference up = profile.getReference("users");
+    private final FirebaseDatabase _firebase = FirebaseDatabase.getInstance();
+    private final DatabaseReference ref = _firebase.getReference("users");
 
 
     private int gender = -1;

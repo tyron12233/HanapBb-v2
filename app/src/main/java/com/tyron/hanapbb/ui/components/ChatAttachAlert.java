@@ -30,9 +30,9 @@ import java.util.ArrayList;
 public class ChatAttachAlert extends BottomSheet implements BottomSheet.BottomSheetDelegateInterface {
 
     private int selectedId;
-    private int attachItemSize = AndroidUtilities.dp(85);
+    private final int attachItemSize = AndroidUtilities.dp(85);
 
-    private Paint attachButtonPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint attachButtonPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     protected SizeNotifierFrameLayoutPhoto sizeNotifierFrameLayout;
 
@@ -193,8 +193,8 @@ public class ChatAttachAlert extends BottomSheet implements BottomSheet.BottomSh
 
     private class AttachButton extends FrameLayout{
 
-        private TextView textView;
-        private ImageView imageView;
+        private final TextView textView;
+        private final ImageView imageView;
 
         private boolean checked;
         private int currentId;
@@ -295,8 +295,8 @@ public class ChatAttachAlert extends BottomSheet implements BottomSheet.BottomSh
 
     }
 
-    private ArrayList<android.graphics.Rect> exclusionRects = new ArrayList<>();
-    private android.graphics.Rect exclustionRect = new Rect();
+    private final ArrayList<android.graphics.Rect> exclusionRects = new ArrayList<>();
+    private final android.graphics.Rect exclustionRect = new Rect();
 
     public ChatAttachAlert(Context context, final BaseFragment parentFragment) {
         super(context, false);

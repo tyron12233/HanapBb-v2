@@ -31,21 +31,21 @@ public class FileLoader {
     public static final int MEDIA_DIR_CACHE = 4;
 
     private HashMap<Integer, File> mediaDirs = null;
-    private volatile DispatchQueue fileLoaderQueue = new DispatchQueue("fileUploadQueue");
+    private final DispatchQueue fileLoaderQueue = new DispatchQueue("fileUploadQueue");
 
-    private LinkedList<FileLoadOperation> loadOperationQueue = new LinkedList<>();
-    private LinkedList<FileLoadOperation> audioLoadOperationQueue = new LinkedList<>();
-    private LinkedList<FileLoadOperation> photoLoadOperationQueue = new LinkedList<>();
-    private ConcurrentHashMap<String, FileLoadOperation> loadOperationPaths = new ConcurrentHashMap<>();
-    private HashMap<String, Long> uploadSizes = new HashMap<>();
+    private final LinkedList<FileLoadOperation> loadOperationQueue = new LinkedList<>();
+    private final LinkedList<FileLoadOperation> audioLoadOperationQueue = new LinkedList<>();
+    private final LinkedList<FileLoadOperation> photoLoadOperationQueue = new LinkedList<>();
+    private final ConcurrentHashMap<String, FileLoadOperation> loadOperationPaths = new ConcurrentHashMap<>();
+    private final HashMap<String, Long> uploadSizes = new HashMap<>();
 
     private FileLoaderDelegate delegate = null;
 
     private int currentLoadOperationsCount = 0;
     private int currentAudioLoadOperationsCount = 0;
     private int currentPhotoLoadOperationsCount = 0;
-    private int currentUploadOperationsCount = 0;
-    private int currentUploadSmallOperationsCount = 0;
+    private final int currentUploadOperationsCount = 0;
+    private final int currentUploadSmallOperationsCount = 0;
 
     private static volatile FileLoader Instance = null;
 

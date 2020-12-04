@@ -5,27 +5,24 @@ import android.os.Message;
 import androidx.annotation.NonNull;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuth.AuthStateListener;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
-import com.tyron.hanapbb.ui.models.MessagesModel;
 import com.tyron.hanapbb.ui.models.UserModel;
 
 public class UserConfig {
-    private static FirebaseAuth auth = FirebaseAuth.getInstance();
-    private static FirebaseDatabase database = FirebaseDatabase.getInstance();
-    private static DatabaseReference myRef = database.getReference("users");
+    private static final FirebaseAuth auth = FirebaseAuth.getInstance();
+    private static final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private static final DatabaseReference myRef = database.getReference("users");
 
     public static UserModel config;
 
     public static boolean isLoggedIn(){
         return FirebaseAuth.getInstance().getCurrentUser() != null;
-    };
+    }
 
     public static void signOut(){
         auth.signOut();

@@ -18,7 +18,7 @@ import com.tyron.hanapbb.messenger.AndroidUtilities;
 public class SimpleTextView extends View implements Drawable.Callback {
 
     private Layout layout;
-    private TextPaint textPaint;
+    private final TextPaint textPaint;
     private int gravity = Gravity.LEFT | Gravity.TOP;
     private CharSequence text;
     private Drawable leftDrawable;

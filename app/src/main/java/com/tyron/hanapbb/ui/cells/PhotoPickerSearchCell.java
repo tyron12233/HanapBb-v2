@@ -25,10 +25,10 @@ public class PhotoPickerSearchCell extends LinearLayout {
 
     private class SearchButton extends FrameLayout {
 
-        private TextView textView1;
-        private TextView textView2;
-        private ImageView imageView;
-        private View selector;
+        private final TextView textView1;
+        private final TextView textView2;
+        private final ImageView imageView;
+        private final View selector;
 
         public SearchButton(Context context) {
             super(context);

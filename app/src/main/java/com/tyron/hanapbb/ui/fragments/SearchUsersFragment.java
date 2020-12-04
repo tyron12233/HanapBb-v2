@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,6 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -32,11 +30,9 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.tyron.hanapbb.R;
 import com.tyron.hanapbb.messenger.UserConfig;
-import com.tyron.hanapbb.ui.HomeActivity;
 import com.tyron.hanapbb.ui.actionbar.BackDrawable;
 import com.tyron.hanapbb.ui.actionbar.BaseFragment;
 import com.tyron.hanapbb.ui.models.ConversationsIdModel;
-import com.tyron.hanapbb.ui.models.ConversationsModel;
 import com.tyron.hanapbb.ui.models.UserModel;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -47,17 +43,17 @@ public class SearchUsersFragment extends BaseFragment {
     public SearchUsersFragment(){
 
     }
-    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    private DatabaseReference databaseReference = firebaseDatabase.getReference("users");
-    private DatabaseReference conversationsRef = firebaseDatabase.getReference("conversations");
-    private Query query = databaseReference;
+    private final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    private final DatabaseReference databaseReference = firebaseDatabase.getReference("users");
+    private final DatabaseReference conversationsRef = firebaseDatabase.getReference("conversations");
+    private final Query query = databaseReference;
 
     private RecyclerView recyclerView;
 
-    private PagedList.Config config = new PagedList.Config.Builder()
+    private final PagedList.Config config = new PagedList.Config.Builder()
             .setEnablePlaceholders(false)
             .setPrefetchDistance(10)
-            .setPageSize(20)
+            .setPageSize(40)
             .build();
     private DatabasePagingOptions<UserModel> options;
 
@@ -90,7 +86,6 @@ public class SearchUsersFragment extends BaseFragment {
         actionBar.setCastShadows(false);
         actionBar.setTitle("Users");
         actionBar.setItemsBackgroundColor(Color.parseColor("#000000"));
-
         return fragmentView;
     }
 
@@ -120,8 +115,8 @@ public class SearchUsersFragment extends BaseFragment {
                     rootView.setOnClickListener((view1) -> {
                         conversationsRef.child(UserConfig.getUid()).child(model.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
 
-                            int compare = model.getUid().compareTo(UserConfig.getUid());
-                            String chat_id = (compare == 0 ? UserConfig.getUid() + model.getUid() : model.getUid() + UserConfig.getUid());
+                            final int compare = model.getUid().compareTo(UserConfig.getUid());
+                            final String chat_id = (compare == 0 ? UserConfig.getUid() + model.getUid() : model.getUid() + UserConfig.getUid());
 
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {

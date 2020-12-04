@@ -23,17 +23,17 @@ public class PhotoPickerAlbumsCell extends FrameLayout {
         void didSelectAlbum(MediaController.AlbumEntry albumEntry);
     }
 
-    private AlbumView[] albumViews;
-    private MediaController.AlbumEntry[] albumEntries;
+    private final AlbumView[] albumViews;
+    private final MediaController.AlbumEntry[] albumEntries;
     private int albumsCount;
     private PhotoPickerAlbumsCellDelegate delegate;
 
     private class AlbumView extends FrameLayout {
 
-        private BackupImageView imageView;
-        private TextView nameTextView;
-        private TextView countTextView;
-        private View selector;
+        private final BackupImageView imageView;
+        private final TextView nameTextView;
+        private final TextView countTextView;
+        private final View selector;
 
         public AlbumView(Context context) {
             super(context);

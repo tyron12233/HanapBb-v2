@@ -9,8 +9,8 @@ import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.ItemTouchHelper;
+import android.recyclerview.widget.RecyclerView;
+import android.recyclerview.widget.ItemTouchHelper;
 
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
@@ -22,11 +22,11 @@ import com.tyron.hanapbb.ui.adapters.ChatAdapter;
 
 public class SwipeController extends ItemTouchHelper.Callback {
 
-    private Context mContext;
-    private ISwipeControllerActions mSwipeControllerActions;
+    private final Context mContext;
+    private final ISwipeControllerActions mSwipeControllerActions;
 
-    private Drawable mReplyIcon;
-    private Drawable mReplyIconBackground;
+    private final Drawable mReplyIcon;
+    private final Drawable mReplyIconBackground;
 
     private RecyclerView.ViewHolder mCurrentViewHolder;
     private View mView;
@@ -42,10 +42,10 @@ public class SwipeController extends ItemTouchHelper.Callback {
 
     private int mBackgroundColor = 0x20606060;
 
-    private int mReplyBackgroundOffset = 18;
+    private final int mReplyBackgroundOffset = 18;
 
-    private int mReplyIconXOffset = 12;
-    private int mReplyIconYOffset = 11;
+    private final int mReplyIconXOffset = 12;
+    private final int mReplyIconYOffset = 11;
 
     public SwipeController(Context context, ISwipeControllerActions swipeControllerActions){
         mContext = context;
@@ -117,11 +117,7 @@ public class SwipeController extends ItemTouchHelper.Callback {
             recyclerView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
-                    if (event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_UP) {
-                        mSwipeBack = true;
-                    } else {
-                        mSwipeBack = false;
-                    }
+                    mSwipeBack = event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_UP;
                     if (mSwipeBack) {
                         if (Math.abs(mView.getTranslationX()) >= convertToDp(35)) {
                             mSwipeControllerActions.onSwipePerformed(viewHolder.getAdapterPosition());

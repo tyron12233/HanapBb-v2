@@ -40,10 +40,10 @@ public class NotificationCenter {
     public static final int screenshotTook = totalEvents++;
     public static final int albumsDidLoaded = totalEvents++;
 
-    private SparseArray<ArrayList<Object>> observers = new SparseArray<>();
-    private SparseArray<ArrayList<Object>> removeAfterBroadcast = new SparseArray<>();
-    private SparseArray<ArrayList<Object>> addAfterBroadcast = new SparseArray<>();
-    private ArrayList<DelayedPost> delayedPosts = new ArrayList<>(10);
+    private final SparseArray<ArrayList<Object>> observers = new SparseArray<>();
+    private final SparseArray<ArrayList<Object>> removeAfterBroadcast = new SparseArray<>();
+    private final SparseArray<ArrayList<Object>> addAfterBroadcast = new SparseArray<>();
+    private final ArrayList<DelayedPost> delayedPosts = new ArrayList<>(10);
 
     private int broadcasting = 0;
     private int[] allowedNotifications;
@@ -60,8 +60,8 @@ public class NotificationCenter {
             this.args = args;
         }
 
-        private int id;
-        private Object[] args;
+        private final int id;
+        private final Object[] args;
     }
 
     private static volatile NotificationCenter Instance = null;
@@ -79,7 +79,7 @@ public class NotificationCenter {
         return localInstance;
     }
 
-    public void setAllowedNotificationsDutingAnimation(int notifications[]) {
+    public void setAllowedNotificationsDutingAnimation(int[] notifications) {
         allowedNotifications = notifications;
     }
 

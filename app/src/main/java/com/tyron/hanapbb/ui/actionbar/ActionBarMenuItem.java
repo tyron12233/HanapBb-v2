@@ -55,7 +55,7 @@ public class ActionBarMenuItem extends FrameLayout {
     }
 
     private ActionBarPopupWindow.ActionBarPopupWindowLayout popupLayout;
-    private ActionBarMenu parentMenu;
+    private final ActionBarMenu parentMenu;
     private ActionBarPopupWindow popupWindow;
     private EditText searchField;
     private ImageView clearButton;
@@ -304,11 +304,7 @@ public class ActionBarMenuItem extends FrameLayout {
         }
         processedPopupClick = false;
         popupWindow.setFocusable(true);
-        if (popupLayout.getMeasuredWidth() == 0) {
-            updateOrShowPopup(true, true);
-        } else {
-            updateOrShowPopup(true, false);
-        }
+        updateOrShowPopup(true, popupLayout.getMeasuredWidth() == 0);
         popupWindow.startAnimation();
     }
 

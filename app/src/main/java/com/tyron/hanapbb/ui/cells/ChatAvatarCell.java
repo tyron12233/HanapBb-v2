@@ -27,6 +27,7 @@ import com.tyron.hanapbb.messenger.FirebaseUtilities;
 import com.tyron.hanapbb.messenger.NotificationCenter;
 import com.tyron.hanapbb.messenger.UserConfig;
 import com.tyron.hanapbb.ui.ConversationsListActivity;
+import com.tyron.hanapbb.ui.ProfileActivity;
 import com.tyron.hanapbb.ui.actionbar.ActionBar;
 import com.tyron.hanapbb.ui.actionbar.SimpleTextView;
 import com.tyron.hanapbb.ui.actionbar.Theme;
@@ -34,6 +35,7 @@ import com.tyron.hanapbb.ui.components.SendingFileDrawable;
 import com.tyron.hanapbb.ui.components.StatusDrawable;
 import com.tyron.hanapbb.ui.components.TypingDotsDrawable;
 import com.tyron.hanapbb.ui.fragments.ChatFragment;
+import com.tyron.hanapbb.ui.models.UserModel;
 
 import java.text.SimpleDateFormat;
 
@@ -41,24 +43,26 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatAvatarCell extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
 
-    private ChatFragment parentFragment;
-    private boolean occupyStatusBar = false;
+    private final ChatFragment parentFragment;
+    private final boolean occupyStatusBar = false;
 
-    private SimpleTextView titleTextView;
-    private SimpleTextView subtitleTextView;
+    private final SimpleTextView titleTextView;
+    private final SimpleTextView subtitleTextView;
 
-    private StatusDrawable[] statusDrawables = new StatusDrawable[5];
+    private final StatusDrawable[] statusDrawables = new StatusDrawable[5];
 
-    private CircleImageView avatarImageView;
+    private final CircleImageView avatarImageView;
 
-    private int leftPadding = AndroidUtilities.dp(8);
+    private final int leftPadding = AndroidUtilities.dp(8);
 
     private AnimatorSet titleAnimation;
 
-    private String chat_id;
+    private final String chat_id;
+    private UserModel userModel;
 
-    public ChatAvatarCell(@NonNull Context context, ChatFragment activity, String chat_id) {
+    public ChatAvatarCell(@NonNull Context context, ChatFragment activity, String chat_id, UserModel model) {
         super(context);
+        userModel = model;
         this.chat_id = chat_id;
         parentFragment = activity;
         avatarImageView = new CircleImageView(context);
@@ -95,6 +99,16 @@ public class ChatAvatarCell extends FrameLayout implements NotificationCenter.No
         statusDrawables[1].setIsChat(true);
 
         listenForStatus();
+    }
+
+    private void openProfile(boolean b) {
+        ProfileActivity fragment = new ProfileActivity();
+        fragment.setPlayProfileAnimation(2);
+        fragment.setProfileDetails(userModel);
+        parentFragment.presentFragment(fragment);
+    }
+    public void setUserModel(UserModel userModel){
+        this.userModel = userModel;
     }
 
     private void listenForStatus() {
@@ -199,6 +213,10 @@ public class ChatAvatarCell extends FrameLayout implements NotificationCenter.No
             subtitleTextView.setLeftDrawable(null);
             statusDrawables[1].stop();
         }
+    }
+
+    public void clicked() {
+        openProfile(false);
     }
 }
 

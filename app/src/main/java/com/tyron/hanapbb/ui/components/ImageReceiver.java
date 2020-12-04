@@ -33,6 +33,83 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
         void didSetImage(ImageReceiver imageReceiver, boolean set, boolean thumb);
     }
 
+    public static class BitmapHolder {
+
+        private String key;
+        private boolean recycleOnRelease;
+        public Bitmap bitmap;
+        public Drawable drawable;
+        public int orientation;
+
+        public BitmapHolder(Bitmap b, String k, int o) {
+            bitmap = b;
+            key = k;
+            orientation = o;
+            if (key != null) {
+                ImageLoader.getInstance().incrementUseCount(key);
+            }
+        }
+
+        public BitmapHolder(Drawable d, String k, int o) {
+            drawable = d;
+            key = k;
+            orientation = o;
+            if (key != null) {
+                ImageLoader.getInstance().incrementUseCount(key);
+            }
+        }
+
+        public BitmapHolder(Bitmap b) {
+            bitmap = b;
+            recycleOnRelease = true;
+        }
+
+        public int getWidth() {
+            return bitmap != null ? bitmap.getWidth() : 0;
+        }
+
+        public int getHeight() {
+            return bitmap != null ? bitmap.getHeight() : 0;
+        }
+
+        public boolean isRecycled() {
+            return bitmap == null || bitmap.isRecycled();
+        }
+
+        public void release() {
+            if (key == null) {
+                if (recycleOnRelease && bitmap != null) {
+                    bitmap.recycle();
+                }
+                bitmap = null;
+                drawable = null;
+                return;
+            }
+            boolean canDelete = ImageLoader.getInstance().decrementUseCount(key);
+//            if (!ImageLoader.getInstance().isInMemCache(key, false)) {
+//                if (canDelete) {
+//                    if (bitmap != null) {
+//                        bitmap.recycle();
+//                    } else if (drawable != null) {
+//                        if (drawable instanceof RLottieDrawable) {
+//                            RLottieDrawable fileDrawable = (RLottieDrawable) drawable;
+//                            fileDrawable.recycle();
+//                        } else if (drawable instanceof AnimatedFileDrawable) {
+//                            AnimatedFileDrawable fileDrawable = (AnimatedFileDrawable) drawable;
+//                            fileDrawable.recycle();
+//                        } else if (drawable instanceof BitmapDrawable) {
+//                            Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+//                            bitmap.recycle();
+//                        }
+//                    }
+//                }
+//            }
+            key = null;
+            bitmap = null;
+            drawable = null;
+        }
+    }
+
     private class SetImageBackup {
         public TLObject fileLocation;
         public String httpUrl;
@@ -49,7 +126,7 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
     private Integer tag;
     private Integer thumbTag;
     private boolean canceledLoading;
-    private static PorterDuffColorFilter selectedColorFilter = new PorterDuffColorFilter(0xffdddddd,
+    private static final PorterDuffColorFilter selectedColorFilter = new PorterDuffColorFilter(0xffdddddd,
             PorterDuff.Mode.MULTIPLY);
 
     private SetImageBackup setImageBackup;
@@ -74,7 +151,7 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
     private boolean invalidateAll;
 
     private int imageX, imageY, imageW, imageH;
-    private Rect drawRegion = new Rect();
+    private final Rect drawRegion = new Rect();
     private boolean isVisible = true;
     private boolean isAspectFit;
     private boolean forcePreview;
@@ -82,9 +159,9 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
     private BitmapShader bitmapShader;
     private BitmapShader bitmapShaderThumb;
     private static Paint roundPaint;
-    private RectF roundRect = new RectF();
-    private RectF bitmapRect = new RectF();
-    private Matrix shaderMatrix = new Matrix();
+    private final RectF roundRect = new RectF();
+    private final RectF bitmapRect = new RectF();
+    private final Matrix shaderMatrix = new Matrix();
     private float overrideAlpha = 1.0f;
     private boolean isPressed;
     private int orientation;

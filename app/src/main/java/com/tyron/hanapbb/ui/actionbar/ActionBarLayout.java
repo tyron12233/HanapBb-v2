@@ -47,7 +47,7 @@ public class ActionBarLayout extends FrameLayout {
 
     public class LinearLayoutContainer extends LinearLayout {
 
-        private Rect rect = new Rect();
+        private final Rect rect = new Rect();
         private boolean isKeyboardVisible;
 
         public LinearLayoutContainer(Context context) {
@@ -120,8 +120,8 @@ public class ActionBarLayout extends FrameLayout {
     private ActionBar currentActionBar;
 
     private AnimatorSet currentAnimation;
-    private DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator(1.5f);
-    private AccelerateDecelerateInterpolator accelerateDecelerateInterpolator = new AccelerateDecelerateInterpolator();
+    private final DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator(1.5f);
+    private final AccelerateDecelerateInterpolator accelerateDecelerateInterpolator = new AccelerateDecelerateInterpolator();
 
     public float innerTranslationX;
 
@@ -196,7 +196,7 @@ public class ActionBarLayout extends FrameLayout {
         }
     }
 
-    public void drawHeaderShadow(Canvas canvas, int y) {
+    public void drawHeaderShadow(Canvas canvas, int i, int y) {
         if (headerShadowDrawable != null) {
             headerShadowDrawable.setBounds(0, y, getMeasuredWidth(),
                     y + headerShadowDrawable.getIntrinsicHeight());
@@ -675,7 +675,7 @@ public class ActionBarLayout extends FrameLayout {
         fragment.setParentLayout(this);
         View fragmentView = fragment.fragmentView;
         if (fragmentView == null) {
-            fragmentView = fragment.createView(parentActivity);
+             fragmentView = fragment.createView(parentActivity);
         } else {
             ViewGroup parent = (ViewGroup) fragmentView.getParent();
             if (parent != null) {

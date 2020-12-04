@@ -33,7 +33,7 @@ import static android.R.attr.orientation;
 
 public class MediaController implements NotificationCenter.NotificationCenterDelegate {
     public static int[] readArgs = new int[3];
-    private boolean saveToGallery = true;
+    private final boolean saveToGallery = true;
 
     public interface FileDownloadProgressListener {
         void onFailedDownload(String fileName);
@@ -140,7 +140,7 @@ public class MediaController implements NotificationCenter.NotificationCenterDel
 
     }
 
-    private HashMap<Long, Long> typingTimes = new HashMap<>();
+    private final HashMap<Long, Long> typingTimes = new HashMap<>();
 
     public static final int AUTODOWNLOAD_MASK_PHOTO = 1;
     public static final int AUTODOWNLOAD_MASK_AUDIO = 2;
@@ -153,19 +153,19 @@ public class MediaController implements NotificationCenter.NotificationCenterDel
     private Runnable refreshGalleryRunnable;
     public static AlbumEntry allPhotosAlbumEntry;
 
-    private HashMap<String, ArrayList<WeakReference<FileDownloadProgressListener>>> loadingFileObservers = new HashMap<>();
-    private HashMap<Integer, String> observersByTag = new HashMap<>();
+    private final HashMap<String, ArrayList<WeakReference<FileDownloadProgressListener>>> loadingFileObservers = new HashMap<>();
+    private final HashMap<Integer, String> observersByTag = new HashMap<>();
     private boolean listenerInProgress = false;
-    private HashMap<String, FileDownloadProgressListener> addLaterArray = new HashMap<>();
-    private ArrayList<FileDownloadProgressListener> deleteLaterArray = new ArrayList<>();
+    private final HashMap<String, FileDownloadProgressListener> addLaterArray = new HashMap<>();
+    private final ArrayList<FileDownloadProgressListener> deleteLaterArray = new ArrayList<>();
 
     private int playerBufferSize = 0;
 
-    private ArrayList<AudioBuffer> freePlayerBuffers = new ArrayList<>();
+    private final ArrayList<AudioBuffer> freePlayerBuffers = new ArrayList<>();
 
     private final Object sync = new Object();
 
-    private ArrayList<ByteBuffer> recordBuffers = new ArrayList<>();
+    private final ArrayList<ByteBuffer> recordBuffers = new ArrayList<>();
     private int recordBufferSize;
 
     private class InternalObserver extends ContentObserver {
@@ -236,7 +236,7 @@ public class MediaController implements NotificationCenter.NotificationCenterDel
 
     private ExternalObserver externalObserver = null;
     private InternalObserver internalObserver = null;
-    private int startObserverToken = 0;
+    private final int startObserverToken = 0;
 
     private final class StopMediaObserverRunnable implements Runnable {
         public int currentObserverToken = 0;
